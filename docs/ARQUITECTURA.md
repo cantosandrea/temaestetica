@@ -1,7 +1,7 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.1.0
-**Actualizado:** 8 de noviembre de 2026
+**Versión:** 0.2.0
+**Actualizado:** 9 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
 ---
@@ -56,7 +56,7 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | WooCommerce | 11.2.2 |
 | Mercado Pago | Plugin oficial 8.10.0, inactivo |
 | Tema | `temaestetica` 0.1.0, marca GlowUp |
-| Plugin de reservas | `glowup-turnos` 0.1.0, DB 1.0.0 |
+| Plugin de reservas | `glowup-turnos` 0.2.0, DB 1.1.0 |
 | Prefijo de tablas | `wp_` |
 | Moneda | ARS |
 | Zona horaria | America/Argentina/Buenos_Aires |
@@ -135,15 +135,18 @@ glowup-turnos/
 ├── includes/
 │   ├── class-db.php               Tablas y versión de esquema
 │   ├── class-settings.php         Opción única de ajustes
+│   ├── class-time.php             Zona horaria y fechas locales
 │   ├── class-roles.php            Rol profesional y capacidades
 │   ├── class-activator.php        Instalación, seeds y upgrades
-│   ├── class-rest-api.php         Endpoints públicos de lectura
+│   ├── class-availability.php     Motor de disponibilidad
+│   ├── class-rest-api.php         Endpoints públicos y de reserva
 │   ├── class-plugin.php           Bootstrap y cron
 │   └── repositories/
 │       ├── class-services-repository.php
 │       ├── class-professionals-repository.php
+│       ├── class-schedules-repository.php
 │       └── class-appointments-repository.php
-├── admin/class-admin.php          Panel, listados y ajustes
+├── admin/class-admin.php          Panel, agenda, listados y ajustes
 ├── assets/css/admin.css           Estilos del panel
 ├── public/                        Reservado para assets públicos
 ├── templates/                     Reservado para plantillas del wizard
@@ -238,13 +241,14 @@ Excepciones puntuales: vacaciones, feriados, ausencias o bloqueos. Rango `start_
 | `deposit_amount` | decimal(12,2) | Monto cobrado |
 | `order_id` | bigint unsigned null | Pedido WooCommerce |
 | `hold_expires_at` | datetime null | Vencimiento de la retención |
+| `idempotency_key` | varchar(64) null | Clave única de reintento de reserva |
 | `notes` | text | Notas internas |
 | `health_consent` | tinyint(1) | Consentimiento de datos de salud |
 | `created_at`, `updated_at` | datetime | Auditoría |
 | `cancelled_at` | datetime null | Fecha de cancelación |
 | `cancel_reason` | varchar(190) | Motivo |
 
-Índices: `code` único, `professional_start`, `client_start`, `status_start`, `hold_expires`, `order_id`.
+Índices: `code` único, `idempotency_key` único, `professional_start`, `professional_status_start`, `client_start`, `status_start`, `hold_expires`, `order_id`.
 
 ### 5.7 Relaciones
 
@@ -388,16 +392,18 @@ Principio: el rol profesional no debe poder cambiar precios, servicios ajenos ni
 | GET | `/wp-json/glowup/v1/services` | Servicios activos agrupados por categoría |
 | GET | `/wp-json/glowup/v1/professionals` | Profesionales activas; acepta `service_id` |
 | GET | `/wp-json/glowup/v1/config` | Configuración pública del wizard |
+| GET | `/wp-json/glowup/v1/availability` | Slots disponibles por servicio, profesional y fecha |
+| POST | `/wp-json/glowup/v1/holds` | Crear retención pendiente; requiere sesión con `glowup_book_appointments` e `idempotency_key` |
+| GET | `/wp-json/glowup/v1/appointments` | Turnos de la clienta autenticada |
+
+La retención usa lock por profesional, transacción y validación de solapamientos. La clave de idempotencia debe tener entre 8 y 64 caracteres alfanuméricos, guiones o guiones bajos. Los holds vencidos se marcan como `expired` y dejan de bloquear la disponibilidad.
 
 ### 9.2 Endpoints previstos
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
-| GET | `/glowup/v1/availability` | Slots disponibles por servicio, profesional y fecha |
-| POST | `/glowup/v1/holds` | Crear retención y pedido |
 | POST | `/glowup/v1/appointments/{id}/cancel` | Cancelar con validación de plazo |
 | POST | `/glowup/v1/appointments/{id}/reschedule` | Reprogramar con validación de plazo |
-| GET | `/glowup/v1/appointments` | Turnos de la clienta autenticada |
 
 Las mutaciones deben usar nonce, verificar sesión y capacidad, validar propiedad del turno y responder con errores claros.
 
@@ -477,8 +483,8 @@ chore: ...
 
 ## 14. Deuda técnica y decisiones pendientes
 
-- Motor de disponibilidad, holds y prevención de solapamientos: Fase 2.
 - Wizard público y creación de orden: Fase 3.
+- Cancelación y reprogramación desde la cuenta de la clienta: Fase 3.
 - Mercado Pago sandbox/producción y webhooks: Fase 4, bloqueado por credenciales.
 - Emails reales y recordatorios: Fase 5.
 - CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
@@ -488,7 +494,7 @@ chore: ...
 - Costos de envío y dirección exacta: negocio.
 - Textos legales definitivos y facturación: negocio/legal.
 - Fotos y logo definitivos: contenido.
-- Evaluar si los turnos vencidos se eliminan o se conservan como `expired` para auditoría.
+- Los turnos vencidos se conservan como `expired` para auditoría; revisar la política de retención de datos antes de producción.
 - Evaluar extensión de retención para medios de pago no instantáneos.
 
 ---

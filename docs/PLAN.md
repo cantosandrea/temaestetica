@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.1.0
-**Actualizado:** 8 de noviembre de 2026
-**Estado:** Fase 1 completada. La Fase 2 (motor de disponibilidad y turnos) es el siguiente paso.
+**Versión:** 0.2.0
+**Actualizado:** 9 de noviembre de 2026
+**Estado:** Fase 2 completada. La Fase 3 (wizard público y creación de orden) es el siguiente paso.
 
 ---
 
@@ -16,7 +16,7 @@ GlowUp es un salón de estética integral en Buenos Aires. El proyecto construye
 
 La implementación se apoya en WordPress y WooCommerce para cuentas, catálogo, checkout y pagos. La lógica de agenda vive en un plugin propio, `glowup-turnos`, para no mezclar reglas de negocio con la presentación. El tema `temaestetica` conserva el slug técnico y muestra la marca **GlowUp**.
 
-El trabajo se desarrolla por fases. Al cierre de este documento están completas la base técnica, el tema, el contenido inicial, los roles, las tablas de reservas y el catálogo inicial. La agenda todavía no acepta reservas públicas: `/turnos/` muestra un estado “próximamente” hasta que el wizard y el cobro estén listos.
+El trabajo se desarrolla por fases. Al cierre de este documento están completas la base técnica, el tema, el contenido inicial, los roles, las tablas de reservas, el catálogo inicial y el motor de agenda de la Fase 2. La agenda ya calcula disponibilidad, aplica bloqueos y retiene horarios, pero todavía no acepta reservas públicas: `/turnos/` muestra un estado “próximamente” hasta que el wizard y el cobro estén listos.
 
 ---
 
@@ -76,7 +76,8 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Panel GlowUp con métricas básicas y estado del proyecto.
 - Listado de servicios y profesionales.
 - Ajustes de reservas: retención, intervalo, anticipación, políticas, zona horaria, email y recordatorios.
-- Base para la agenda operativa y la edición completa de horarios en fases siguientes.
+- Agenda operativa con bloqueos puntuales para vacaciones, feriados y ausencias.
+- Edición completa de horarios semanales y vista diaria/semanal en la Fase 6.
 
 ---
 
@@ -110,11 +111,11 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | --- | --- | --- |
 | 0. Descubrimiento | Relevamiento, decisiones de negocio, alcance y stack | Completada |
 | 1. Base técnica | Entorno local, backup, WooCommerce, tema, plugin base, contenido y tienda inicial | Completada |
-| 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Siguiente |
-| 3. Wizard de reserva | Flujo público, cuenta, selección de servicio/profesional/horario y creación de orden | Pendiente |
+| 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
+| 3. Wizard de reserva | Flujo público, cuenta, selección de servicio/profesional/horario y creación de orden | Siguiente |
 | 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Pendiente / bloqueada por credenciales |
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
-| 6. Operación | Agenda diaria, edición de horarios, vacaciones, estados y notas | Pendiente |
+| 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
 | 8. Post-MVP | Packs/bonos completos, facturación fiscal, mejoras de fidelización | Pendiente |
 
@@ -129,16 +130,22 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - WooCommerce 11.2.2 activo. Mercado Pago 8.10.0 instalado e inactivo.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
 - Tema GlowUp activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
-- Plugin `glowup-turnos` activo: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
+- Plugin `glowup-turnos` activo en versión 0.2.0 con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
+- Motor de agenda de la Fase 2: disponibilidad por servicio, profesional y fecha; pausas, excepciones y anticipación mínima/máxima.
+- Retención de horarios durante 15 minutos con lock por profesional, transacción, idempotencia y prevención de solapamientos.
+- API REST de disponibilidad, creación de retenciones y consulta de turnos de la clienta autenticada.
+- Agenda de bloqueos en el panel GlowUp, con filtro por profesional y alta/baja de vacaciones, feriados o ausencias.
+- Los holds vencidos se conservan como `expired` para auditoría y dejan de bloquear la disponibilidad de inmediato.
 - 30 servicios, 2 profesionales, 30 relaciones servicio-profesional y 12 bloques horarios sembrados.
 - 18 productos en 5 categorías, con SKU, stock, descripciones y precios.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP ni desbordes horizontales.
 - Checkout con carrito real verificado: artículo, total, métodos de entrega y botón de compra.
 - Sincronización del contador del carrito corregida para el carrito por bloques.
+- Datos de prueba de la Fase 2 limpiados: 0 turnos y 0 bloqueos al cierre.
 
 ### En curso
 
-- Documentación formal del proyecto y de la arquitectura.
+- Preparación de la Fase 3: wizard público, creación de la orden WooCommerce y conexión con el checkout.
 
 ### Bloqueado o pendiente de terceros
 
@@ -182,14 +189,13 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 
 ## 9. Próximos pasos
 
-1. Implementar el motor de disponibilidad y las excepciones de horario.
-2. Persistir turnos con retención, idempotencia y bloqueo contra solapamientos.
-3. Construir el wizard público de reserva y el flujo de cuenta.
-4. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno.
-5. Implementar emails transaccionales y recordatorios.
-6. Completar la agenda operativa del panel.
-7. Reemplazar placeholders con fotos y cerrar textos legales.
-8. Ejecutar QA integral y preparar el despliegue a producción.
+1. Construir el wizard público de reserva y el flujo de cuenta en `/turnos/`.
+2. Crear la orden de WooCommerce al confirmar la retención y asociarla al turno.
+3. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno.
+4. Implementar emails transaccionales y recordatorios.
+5. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios.
+6. Reemplazar placeholders con fotos y cerrar textos legales.
+7. Ejecutar QA integral y preparar el despliegue a producción.
 
 ---
 
@@ -198,3 +204,4 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | Fecha | Cambio |
 | --- | --- |
 | 2026-11-08 | Cierre de Fase 0 y Fase 1; documentación inicial del proyecto. |
+| 2026-11-09 | Cierre de Fase 2: disponibilidad, excepciones, retenciones, anti-solapamiento, API REST y agenda de bloqueos. |

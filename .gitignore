@@ -1,0 +1,11 @@
+# Tooling local de agentes
+.agents/
+skills-lock.json
+
+# Build temporal del documento Word
+docs/_docx/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log

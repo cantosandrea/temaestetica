@@ -1,0 +1,20 @@
+/*
+Theme Name: GlowUp
+Theme URI: http://localhost/esteticaweb
+Author: GlowUp
+Author URI: http://localhost/esteticaweb
+Description: Tema clásico híbrido para GlowUp, estética integral. Diseñado para reservas, tienda WooCommerce y contenido editorial.
+Version: 0.1.0
+Requires at least: 6.5
+Tested up to: 7.1
+Requires PHP: 8.1
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: temaestetica
+Tags: custom-colors, custom-logo, custom-menu, editor-style, featured-images, full-width-template, theme-options, translation-ready, wide-blocks
+*/
+
+/*
+ * Los estilos del sitio están en assets/css/main.css.
+ * Este archivo conserva únicamente la cabecera obligatoria del tema.
+ */

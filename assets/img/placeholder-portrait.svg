@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1125" role="img" aria-label="Retrato GlowUp">
+	<defs>
+		<linearGradient id="portrait-bg" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#E9DDF7"/>
+			<stop offset="1" stop-color="#D9C7F0"/>
+		</linearGradient>
+		<linearGradient id="portrait-body" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#8E1B3A"/>
+			<stop offset="1" stop-color="#2A0E1A"/>
+		</linearGradient>
+	</defs>
+	<rect width="900" height="1125" fill="url(#portrait-bg)"/>
+	<path d="M180 1125V450a270 270 0 0 1 540 0v675Z" fill="#FFF7F1" opacity=".5"/>
+	<circle cx="450" cy="430" r="168" fill="#F4C9B8"/>
+	<path d="M282 430c0-110 74-190 168-190s168 80 168 190c0 44-12 88-34 124-18-92-74-138-134-138s-116 46-134 138c-22-36-34-80-34-124Z" fill="#2A0E1A"/>
+	<path d="M300 1125c8-210 68-340 150-340s142 130 150 340Z" fill="url(#portrait-body)"/>
+	<path d="M450 785v340" stroke="#FFF7F1" stroke-opacity=".16" stroke-width="2"/>
+	<circle cx="450" cy="620" r="238" fill="none" stroke="#2A0E1A" stroke-opacity=".18" stroke-width="2" stroke-dasharray="3 12"/>
+	<path d="M98 200c86 66 86 180 0 246M802 200c-86 66-86 180 0 246" fill="none" stroke="#FFF7F1" stroke-opacity=".6" stroke-width="2"/>
+	<circle cx="450" cy="430" r="310" fill="none" stroke="#FFF7F1" stroke-opacity=".42" stroke-width="2"/>
+	<rect x="45" y="45" width="810" height="1035" rx="28" fill="none" stroke="#FFFCF8" stroke-opacity=".55" stroke-width="2"/>
+</svg>

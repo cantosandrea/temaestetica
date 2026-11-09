@@ -1,0 +1,105 @@
+/* Block editor styles for GlowUp. */
+
+:root {
+	--ink: #2a0e1a;
+	--ink-soft: #513640;
+	--cherry: #8e1b3a;
+	--cherry-deep: #611025;
+	--pink: #ff6f91;
+	--butter: #f6d86b;
+	--porcelain: #fff7f1;
+	--paper: #fffcf8;
+	--lilac: #d9c7f0;
+	--muted: #6f5a61;
+	--font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+	--font-body: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+}
+
+.editor-styles-wrapper {
+	background: var(--porcelain);
+	color: var(--ink);
+	font-family: var(--font-body);
+	font-size: 17px;
+	line-height: 1.65;
+}
+
+.editor-styles-wrapper h1,
+.editor-styles-wrapper h2,
+.editor-styles-wrapper h3,
+.editor-styles-wrapper h4,
+.editor-styles-wrapper h5,
+.editor-styles-wrapper h6 {
+	font-family: var(--font-display);
+	font-weight: 400;
+	line-height: 1.02;
+	letter-spacing: -0.035em;
+	color: var(--ink);
+}
+
+.editor-styles-wrapper h1 {
+	font-size: clamp(3rem, 6vw, 5.5rem);
+}
+
+.editor-styles-wrapper h2 {
+	font-size: clamp(2.25rem, 4vw, 3.75rem);
+}
+
+.editor-styles-wrapper h3 {
+	font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+}
+
+.editor-styles-wrapper a {
+	color: var(--cherry);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.editor-styles-wrapper blockquote {
+	margin: 2rem 0;
+	padding-left: 1.3rem;
+	border-left: 3px solid var(--pink);
+	font-family: var(--font-display);
+	font-size: clamp(1.5rem, 2.5vw, 2rem);
+	line-height: 1.2;
+}
+
+.editor-styles-wrapper .wp-block-button__link {
+	padding: 0.95rem 1.45rem;
+	border-radius: 999px;
+	background: var(--cherry);
+	color: var(--porcelain);
+	font-family: var(--font-body);
+	font-size: 0.9rem;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+}
+
+.editor-styles-wrapper .wp-block-button__link:hover {
+	background: var(--cherry-deep);
+	color: var(--porcelain);
+}
+
+.editor-styles-wrapper .wp-block-quote.is-style-large,
+.editor-styles-wrapper .wp-block-quote.has-text-align-center {
+	border: 0;
+}
+
+.editor-styles-wrapper .wp-block-table table {
+	border-collapse: collapse;
+}
+
+.editor-styles-wrapper .wp-block-table th,
+.editor-styles-wrapper .wp-block-table td {
+	padding: 0.6rem;
+	border-bottom: 1px solid rgba(42, 14, 26, 0.16);
+}
+
+.editor-styles-wrapper .wp-block-separator {
+	border-color: rgba(42, 14, 26, 0.16);
+}
+
+.editor-styles-wrapper .wp-block-group.has-background {
+	padding: clamp(1.5rem, 3vw, 2.5rem);
+	border-radius: 18px;
+}

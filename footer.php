@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<span class="footer-logo__mark"><?php echo glowup_mark_svg( 46 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 				<span class="footer-logo__text">glowup</span>
 			</a>
-			<p class="footer-brand__text"><?php esc_html_e( 'Estética integral en Buenos Aires. Uñas, cabello, facial y depilación con turnos que respetan tu tiempo.', 'temaestetica' ); ?></p>
+			<p class="footer-brand__text"><?php esc_html_e( 'Estética integral en La Rioja capital. Uñas, cabello, facial y depilación definitiva con turnos que respetan tu tiempo.', 'temaestetica' ); ?></p>
 
 			<?php $social = glowup_social_links(); ?>
 			<?php if ( $social ) : ?>
@@ -78,7 +78,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="container footer-bottom">
 		<p>&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> GlowUp. <?php esc_html_e( 'Todos los derechos reservados.', 'temaestetica' ); ?></p>
-		<p><?php esc_html_e( 'Hecho con cuidado en Buenos Aires.', 'temaestetica' ); ?></p>
+		<p><?php esc_html_e( 'Hecho con cuidado en La Rioja capital.', 'temaestetica' ); ?></p>
 	</div>
 
 	<div class="footer-wordmark" aria-hidden="true">glowup</div>

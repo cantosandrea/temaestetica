@@ -173,7 +173,7 @@ function glowup_contact( $key ) {
 	$defaults = array(
 		'email'     => 'hola@glowup.com',
 		'phone'     => '+54 9 11 0000-0000',
-		'address'   => 'Dirección a confirmar, Buenos Aires',
+		'address'   => 'Dirección a confirmar, La Rioja capital',
 		'hours'     => 'Lunes a viernes de 9 a 20 · Sábados de 9 a 14',
 		'instagram' => 'https://instagram.com/',
 		'tiktok'    => 'https://tiktok.com/',

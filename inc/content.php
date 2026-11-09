@@ -61,17 +61,16 @@ function glowup_fallback_service_menu() {
 			),
 		),
 		'depilacion' => array(
-			'title'       => 'Depilación',
-			'description' => 'Cera tibia, técnica cuidadosa y un después que calma la piel.',
+			'title'       => 'Depilación definitiva',
+			'description' => 'Tecnología láser para una piel suave y sin vello, con evaluación previa.',
 			'items'       => array(
-				array( 'name' => 'Cera piernas completas', 'duration' => 45, 'price' => 12000, 'description' => 'Depilación con cera tibia y cuidado posterior.', 'requires_evaluation' => false ),
-				array( 'name' => 'Cera axilas', 'duration' => 15, 'price' => 5000, 'description' => 'Depilación rápida y prolija.', 'requires_evaluation' => false ),
-				array( 'name' => 'Cera bozo', 'duration' => 10, 'price' => 3500, 'description' => 'Depilación facial con cera de baja temperatura.', 'requires_evaluation' => false ),
-				array( 'name' => 'Cera cavado', 'duration' => 20, 'price' => 6000, 'description' => 'Técnica cuidadosa con cera tibia.', 'requires_evaluation' => false ),
-				array( 'name' => 'Cera brazos completos', 'duration' => 30, 'price' => 9000, 'description' => 'Depilación completa de brazos.', 'requires_evaluation' => false ),
-				array( 'name' => 'Depilación masculina de espalda', 'duration' => 45, 'price' => 15000, 'description' => 'Depilación con cera y protocolo calmante.', 'requires_evaluation' => false ),
-				array( 'name' => 'Tratamiento calmante post-depilación', 'duration' => 30, 'price' => 8000, 'description' => 'Loción calmante, hidratación y recomendaciones de cuidado.', 'requires_evaluation' => false ),
-				array( 'name' => 'Depilación definitiva por zona', 'duration' => 30, 'price' => 18000, 'description' => 'Requiere evaluación previa. Se recomienda un ciclo de 6 sesiones.', 'requires_evaluation' => true ),
+				array( 'name' => 'Definitiva axilas', 'duration' => 15, 'price' => 6000, 'description' => 'Sesión en axilas. Requiere evaluación previa.', 'requires_evaluation' => true ),
+				array( 'name' => 'Definitiva bozo', 'duration' => 15, 'price' => 5000, 'description' => 'Sesión en bozo. Requiere evaluación previa.', 'requires_evaluation' => true ),
+				array( 'name' => 'Definitiva cavado', 'duration' => 30, 'price' => 12000, 'description' => 'Sesión en cavado. Requiere evaluación previa.', 'requires_evaluation' => true ),
+				array( 'name' => 'Definitiva piernas', 'duration' => 45, 'price' => 18000, 'description' => 'Sesión en piernas completas. Requiere evaluación previa.', 'requires_evaluation' => true ),
+				array( 'name' => 'Definitiva brazos', 'duration' => 30, 'price' => 10000, 'description' => 'Sesión en brazos completos. Requiere evaluación previa.', 'requires_evaluation' => true ),
+				array( 'name' => 'Definitiva bikini', 'duration' => 45, 'price' => 16000, 'description' => 'Sesión en bikini. Requiere evaluación previa.', 'requires_evaluation' => true ),
+				array( 'name' => 'Pack completo cuerpo', 'duration' => 120, 'price' => 55000, 'description' => 'Pack con todas las zonas: axilas, bozo, cavado, piernas, brazos y bikini. Requiere evaluación previa.', 'requires_evaluation' => true ),
 			),
 		),
 	);
@@ -204,7 +203,7 @@ function glowup_get_shop_categories() {
 		array( 'slug' => 'unas', 'title' => 'Uñas', 'text' => 'Esmaltes, bases, limas y todo para mantener el acabado.', 'image' => 'shop', 'url' => glowup_shop_url() ),
 		array( 'slug' => 'cabello', 'title' => 'Cabello', 'text' => 'Shampoo, mascarillas y protección térmica.', 'image' => 'shop', 'url' => glowup_shop_url() ),
 		array( 'slug' => 'rostro', 'title' => 'Rostro', 'text' => 'Limpieza, hidratación y protección solar.', 'image' => 'shop', 'url' => glowup_shop_url() ),
-		array( 'slug' => 'cuerpo-depilacion', 'title' => 'Cuerpo', 'text' => 'Cremas, aceites y cuidado post-depilación.', 'image' => 'shop', 'url' => glowup_shop_url() ),
+		array( 'slug' => 'cuerpo-depilacion', 'title' => 'Cuerpo', 'text' => 'Cremas, aceites y cuidado para el cuerpo.', 'image' => 'shop', 'url' => glowup_shop_url() ),
 	);
 
 	$terms = get_terms(

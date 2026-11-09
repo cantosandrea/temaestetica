@@ -60,7 +60,7 @@ function glowup_customize_register( $wp_customize ) {
 	$text_settings = array(
 		'glowup_email'     => array( __( 'Email de contacto', 'temaestetica' ), 'hola@glowup.com', 'sanitize_email' ),
 		'glowup_phone'     => array( __( 'Teléfono / WhatsApp', 'temaestetica' ), '+54 9 11 0000-0000', 'sanitize_text_field' ),
-		'glowup_address'   => array( __( 'Dirección', 'temaestetica' ), 'Dirección a confirmar, Buenos Aires', 'sanitize_text_field' ),
+		'glowup_address'   => array( __( 'Dirección', 'temaestetica' ), 'Dirección a confirmar, La Rioja capital', 'sanitize_text_field' ),
 		'glowup_hours'     => array( __( 'Horarios', 'temaestetica' ), 'Lunes a viernes de 9 a 20 · Sábados de 9 a 14', 'sanitize_text_field' ),
 		'glowup_instagram' => array( __( 'URL de Instagram', 'temaestetica' ), 'https://instagram.com/', 'esc_url_raw' ),
 		'glowup_tiktok'    => array( __( 'URL de TikTok', 'temaestetica' ), 'https://tiktok.com/', 'esc_url_raw' ),

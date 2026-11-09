@@ -8,7 +8,7 @@
 
 ## 1. Resumen ejecutivo
 
-GlowUp es un salón de estética integral en Buenos Aires. El proyecto construye un sitio propio sobre WordPress que reúne tres piezas:
+GlowUp es un salón de estética integral en La Rioja capital. El proyecto construye un sitio propio sobre WordPress que reúne tres piezas:
 
 1. Una vidriera de marca y contenido: servicios, equipo, políticas, preguntas frecuentes y contacto.
 2. Un motor de reservas con cuenta de cliente, pago total al reservar y políticas de cancelación y reprogramación.
@@ -43,7 +43,7 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 ### 3.1 Sitio público
 
 - Inicio con propuesta de valor, servicios destacados, equipo, testimonios y llamado a reservar.
-- Servicios agrupados en Uñas, Cabello, Facial y Depilación, con duración, precio y descripción.
+- Servicios agrupados en Uñas, Cabello, Facial y Depilación definitiva, con duración, precio y descripción.
 - Página del equipo con perfiles de Agustina y Estela.
 - Página de contacto con dirección a confirmar, horarios, email y teléfono.
 - Preguntas frecuentes y políticas de cancelación, privacidad y términos.
@@ -136,7 +136,7 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - API REST de disponibilidad, creación de retenciones y consulta de turnos de la clienta autenticada.
 - Agenda de bloqueos en el panel GlowUp, con filtro por profesional y alta/baja de vacaciones, feriados o ausencias.
 - Los holds vencidos se conservan como `expired` para auditoría y dejan de bloquear la disponibilidad de inmediato.
-- 30 servicios, 2 profesionales, 30 relaciones servicio-profesional y 12 bloques horarios sembrados.
+- 29 servicios, 2 profesionales, 29 relaciones servicio-profesional y 12 bloques horarios sembrados.
 - 18 productos en 5 categorías, con SKU, stock, descripciones y precios.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP ni desbordes horizontales.
 - Checkout con carrito real verificado: artículo, total, métodos de entrega y botón de compra.

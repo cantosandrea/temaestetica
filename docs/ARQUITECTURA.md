@@ -59,7 +59,7 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | Plugin de reservas | `glowup-turnos` 0.2.0, DB 1.1.0 |
 | Prefijo de tablas | `wp_` |
 | Moneda | ARS |
-| Zona horaria | America/Argentina/Buenos_Aires |
+| Zona horaria | America/Argentina/La_Rioja (La Rioja capital, UTC-4) |
 | Checkout | Bloques de WooCommerce |
 | Email | `wp_mail` y cron de WordPress |
 
@@ -177,7 +177,7 @@ Todas las tablas usan el prefijo `wp_glowup_` y `utf8mb4`.
 | `name` | varchar(190) | Nombre visible |
 | `slug` | varchar(190) | URL / identificador único |
 | `description` | text | Descripción pública |
-| `category` | varchar(50) | `unas`, `cabello`, `facial`, `depilacion`, `otros` |
+| `category` | varchar(50) | `unas`, `cabello`, `facial`, `depilacion` (definitiva por zona y pack), `otros` |
 | `duration_min` | smallint | Duración en minutos |
 | `price` | decimal(12,2) | Precio final |
 | `deposit_type` | varchar(20) | `percent` / `fixed`; preparado para señas |

@@ -12,9 +12,9 @@
 
 	<div class="container hero__grid">
 		<div class="hero__copy">
-			<p class="kicker"><?php esc_html_e( 'Estética integral · Buenos Aires', 'temaestetica' ); ?></p>
+			<p class="kicker"><?php esc_html_e( 'Estética integral · La Rioja capital', 'temaestetica' ); ?></p>
 			<h1 class="hero__title"><?php esc_html_e( 'Tu próximo glow', 'temaestetica' ); ?><br><?php esc_html_e( 'empieza acá.', 'temaestetica' ); ?></h1>
-			<p class="hero__lead"><?php esc_html_e( 'Uñas, cabello, facial y depilación en un mismo lugar. Una pausa para vos, con turnos que respetan tu tiempo.', 'temaestetica' ); ?></p>
+			<p class="hero__lead"><?php esc_html_e( 'Uñas, cabello, facial y depilación definitiva en un mismo lugar. Una pausa para vos, con turnos que respetan tu tiempo.', 'temaestetica' ); ?></p>
 
 			<div class="hero__actions">
 				<a class="btn btn--large" href="<?php echo esc_url( glowup_booking_url() ); ?>"><?php esc_html_e( 'Reservar turno', 'temaestetica' ); ?></a>

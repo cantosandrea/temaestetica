@@ -281,4 +281,121 @@
 			root.classList.remove('js-reveal');
 		}
 	}
+
+	/* ---------------------------------------------------------------
+	 * Service marquee: constant speed, seamless loop
+	 * -------------------------------------------------------------
+	 * The CSS animation is the no-JS fallback. Here we measure one group,
+	 * clone it until the strip covers the viewport plus one group, and move
+	 * the track with requestAnimationFrame. Resetting the offset by the
+	 * exact group width makes the loop invisible at any screen size.
+	 * ------------------------------------------------------------- */
+	var marquees = doc.querySelectorAll('[data-marquee]');
+
+	if (marquees.length && !reduceMotion) {
+		marquees.forEach(function (track) {
+			var wrapper = track.parentNode;
+			var original = track.querySelector('.service-marquee__group');
+
+			if (!wrapper || !original) {
+				return;
+			}
+
+			var speed = parseFloat(track.getAttribute('data-marquee-speed')) || 60;
+			var groupWidth = 0;
+			var offset = 0;
+			var lastTime = null;
+			var frame = null;
+
+			var getGroups = function () {
+				return track.querySelectorAll('.service-marquee__group');
+			};
+
+			var removeClones = function () {
+				getGroups().forEach(function (group, index) {
+					if (index > 0) {
+						group.remove();
+					}
+				});
+			};
+
+			var fill = function () {
+				removeClones();
+				groupWidth = original.getBoundingClientRect().width;
+
+				if (!groupWidth) {
+					return;
+				}
+
+				var target = wrapper.clientWidth + groupWidth;
+
+				while (track.getBoundingClientRect().width < target) {
+					track.appendChild(original.cloneNode(true));
+				}
+			};
+
+			var tick = function (time) {
+				if (null === lastTime) {
+					lastTime = time;
+				}
+
+				var delta = Math.min(time - lastTime, 100);
+				lastTime = time;
+				offset = (offset + (speed * delta) / 1000) % groupWidth;
+				track.style.transform = 'translate3d(' + (-offset) + 'px, 0, 0)';
+				frame = window.requestAnimationFrame(tick);
+			};
+
+			var start = function () {
+				if (frame || !groupWidth) {
+					return;
+				}
+
+				lastTime = null;
+				frame = window.requestAnimationFrame(tick);
+			};
+
+			var stop = function () {
+				if (!frame) {
+					return;
+				}
+
+				window.cancelAnimationFrame(frame);
+				frame = null;
+			};
+
+			fill();
+			track.classList.add('is-marquee-ready');
+			start();
+
+			doc.addEventListener('visibilitychange', function () {
+				if (doc.hidden) {
+					stop();
+				} else {
+					start();
+				}
+			});
+
+			if ('IntersectionObserver' in window) {
+				new IntersectionObserver(function (entries) {
+					entries.forEach(function (entry) {
+						if (entry.isIntersecting) {
+							start();
+						} else {
+							stop();
+						}
+					});
+				}).observe(wrapper);
+			}
+
+			var resizeTimer = null;
+			window.addEventListener('resize', function () {
+				window.clearTimeout(resizeTimer);
+				resizeTimer = window.setTimeout(function () {
+					fill();
+					offset = groupWidth ? offset % groupWidth : 0;
+				}, 150);
+			});
+		});
+	}
 })();

@@ -847,9 +847,26 @@ button {
 .service-marquee__track {
 	display: flex;
 	align-items: center;
-	gap: 1.5rem;
 	width: max-content;
 	animation: glow-marquee 34s linear infinite;
+	will-change: transform;
+}
+
+/*
+ * JS takes over the movement once it measures the content; the CSS
+ * animation is only the no-JS fallback.
+ */
+.service-marquee__track.is-marquee-ready {
+	animation: none;
+}
+
+.service-marquee__group {
+	display: flex;
+	align-items: center;
+	flex: 0 0 auto;
+	gap: 1.5rem;
+	/* Matches the gap so each group's width includes its trailing space. */
+	padding-inline-end: 1.5rem;
 }
 
 .service-marquee__item {
@@ -865,8 +882,11 @@ button {
 }
 
 @keyframes glow-marquee {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
 	to {
-		transform: translateX(-50%);
+		transform: translate3d(-50%, 0, 0);
 	}
 }
 

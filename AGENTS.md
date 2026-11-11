@@ -5,18 +5,21 @@
 - Tema clásico híbrido de WordPress para GlowUp. El slug técnico es `temaestetica` y el text domain también; no los cambies aunque la marca visible sea GlowUp.
 - Es un tema clásico con `theme.json`, no un block theme: no agregues `templates/*.html` ni `parts/`.
 - La lógica de reservas vive en el plugin hermano `C:\xampp\htdocs\esteticaweb\wp-content\plugins\glowup-turnos` (repo Git separado). El tema solo consume sus repositorios y su REST; no pongas reglas de agenda acá.
-- `/turnos/` es un “próximamente” intencional hasta que el wizard de Fase 3 esté operativo. No lo conectes a medias ni prometas reservas desde la home.
-- Desarrollo solo local: `http://localhost/esteticaweb`; WordPress 7.1.4, PHP 8.2.12, MariaDB en `localhost:3307`.
-- Reglas cerradas: pago total al reservar; cancelación con reembolso hasta 24 h antes; reprogramación hasta 12 h antes; recordatorios solo por email (sin WhatsApp); precios en ARS con IVA incluido.
-- Mercado Pago está instalado pero inactivo y sin credenciales. No lo actives ni cargues claves hasta que la Fase 4 lo requiera.
+- Fase 2 cerrada. La Fase 3 (wizard público, orden de WooCommerce y checkout) **no está iniciada**: no la arranques sin confirmación explícita. `/turnos/` debe seguir como “próximamente” hasta que el wizard y el cobro estén operativos; no la conectes a medias ni prometas reservas desde la home.
+- Negocio: La Rioja capital; depilación **solo definitiva** (axilas, bozo, cavado, piernas, brazos y bikini, más un pack completo, todos con evaluación previa). No reintroduzcas servicios de cera. Precios ARS con IVA incluido; pago total al reservar; cancelación con reembolso hasta 24 h antes; reprogramación hasta 12 h antes; recordatorios solo por email (sin WhatsApp). Gift card simple incluida; packs/bonos completos y facturación fiscal quedan para post-MVP.
+- Desarrollo local en `http://localhost/esteticaweb`; WordPress 7.1.4, PHP 8.2.12, MariaDB en `localhost:3307`.
+- Acceso externo por ngrok: `wp-config.php` (fuera de los repos) define `WP_HOME`/`WP_SITEURL` dinámicos según `HTTP_HOST` y `X-Forwarded-Proto`. No hardcodees `localhost` en URLs nuevas y no toques ese bloque sin probar localhost y ngrok. `wp option get home` sigue mostrando localhost: es esperado, las constantes mandan en requests web.
+- Mercado Pago 8.10.0 instalado, inactivo y sin credenciales. No lo actives ni cargues claves hasta que la Fase 4 lo requiera.
 
 ## Comandos
 
 `php` y `wp` no están en el PATH. Usá las rutas de XAMPP:
 
 - Lint de un archivo: `C:\xampp\php\php.exe -l ruta\archivo.php`
-- WP-CLI: `C:\xampp\php\php.exe C:\xampp\wp-cli\wp-cli.phar --path=C:\xampp\htdocs\esteticaweb <comando>`
 - Lint de todo el tema (PowerShell): `Get-ChildItem -Recurse -Filter *.php | ForEach-Object { C:\xampp\php\php.exe -l $_.FullName }`
+- Lint del plugin: el mismo comando dentro de `C:\xampp\htdocs\esteticaweb\wp-content\plugins\glowup-turnos`.
+- WP-CLI: `C:\xampp\php\php.exe C:\xampp\wp-cli\wp-cli.phar --path=C:\xampp\htdocs\esteticaweb <comando>`
+- Para datos/opciones o smoke tests, usá `wp eval-file archivo.php`; evita `wp eval` con comillas anidadas en PowerShell.
 
 No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sirven directo: editá `assets/css/main.css` y `assets/js/main.js`; no busques un paso de build.
 
@@ -34,13 +37,16 @@ No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sir
 
 ## Reservas (plugin)
 
-- El plugin expone `glowup/v1`: `GET /availability`, `POST /holds` (requiere sesión con `glowup_book_appointments` e `idempotency_key`), `GET /appointments` (requiere login), más `GET /services`, `/professionals` y `/config`.
+- El plugin expone `glowup/v1`: `GET /availability`, `POST /holds` (requiere sesión con `glowup_book_appointments` e `idempotency_key` que cumpla `^[A-Za-z0-9_-]{8,64}$`), `GET /appointments` (requiere login), más `GET /services`, `/professionals` y `/config`.
+- Versión actual del plugin: `0.2.1`, esquema `1.1.0`. La zona horaria de reservas es `America/Argentina/La_Rioja` y sale de `Settings::get('timezone')`; para fechas usá `Time`/esa configuración, no `wp_timezone()` ni la zona default de PHP.
 - La agenda operativa está en `wp-admin/admin.php?page=glowup-turnos-agenda`. Los bloqueos descuentan disponibilidad pero no cancelan turnos existentes; hay que reprogramar o cancelar a mano.
+- La concurrencia de holds se resuelve con `GET_LOCK` por profesional, transacción y consulta de solapamiento; no la reemplaces por un índice único. Los holds duran 15 minutos y los vencidos se conservan como `expired`.
 - Cualquier cambio de reservas va al repo del plugin y se commitea por separado. El tema solo consume la API.
 
 ## Documentación y verificación
 
-- `docs/PLAN.md` y `docs/ARQUITECTURA.md` (en español) son la referencia de alcance, modelo de datos y fases. Mantenelos sincronizados con el código; `docs/GlowUp-Proyecto.docx` es la versión formal.
-- La documentación de fases puede quedar desfasada: contrastala siempre con `glowup-turnos.php` y el código del plugin antes de asumir qué falta.
+- `docs/PLAN.md` y `docs/ARQUITECTURA.md` (en español) son la referencia de alcance, modelo de datos y fases. Mantenelos sincronizados con el código; `docs/GlowUp-Proyecto.docx` es la versión formal (binaria: no la edites a mano).
+- La documentación de fases puede quedar desfasada: contrastala siempre con `glowup-turnos.php` y el código del plugin antes de asumir qué falta. La versión y el esquema actuales están en la sección de reservas.
 - Antes de cerrar un cambio: `php -l` sobre los archivos tocados, WP-CLI para datos/opciones y navegador para render, consola, enlaces y responsive. No hay tests automatizados.
+- Antes de editar o commitear, mirá `git status`: el árbol puede tener trabajo del usuario (por ejemplo, fotos subidas o cambios en `inc/template-tags.php`). No lo pises ni lo incluyas en un commit sin confirmación; usá `git add` selectivo.
 - Commits atómicos. Convención: `feat(theme): ...`, `fix(theme): ...`, `docs: ...`; en el plugin, `feat(booking): ...` / `fix(booking): ...`.

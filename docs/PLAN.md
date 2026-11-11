@@ -1,7 +1,7 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.2.0
-**Actualizado:** 9 de noviembre de 2026
+**Versión:** 0.2.1
+**Actualizado:** 10 de noviembre de 2026
 **Estado:** Fase 2 completada. La Fase 3 (wizard público y creación de orden) es el siguiente paso.
 
 ---
@@ -45,7 +45,7 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Inicio con propuesta de valor, servicios destacados, equipo, testimonios y llamado a reservar.
 - Servicios agrupados en Uñas, Cabello, Facial y Depilación definitiva, con duración, precio y descripción.
 - Página del equipo con perfiles de Agustina y Estela.
-- Página de contacto con dirección a confirmar, horarios, email y teléfono.
+- Página de contacto con dirección a confirmar en La Rioja capital, horarios, email y teléfono.
 - Preguntas frecuentes y políticas de cancelación, privacidad y términos.
 - Tienda con categorías, ficha de producto, carrito, checkout y mi cuenta.
 - Página de turnos con estado “próximamente” mientras el wizard no esté operativo.
@@ -100,6 +100,7 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | Precios | Finales, con IVA incluido |
 | Facturación fiscal | A evaluar más adelante |
 | Idioma y moneda | Español de Argentina, ARS |
+| Ubicación | La Rioja capital; dirección exacta a confirmar |
 | Hosting | Solo localhost por ahora; producción pendiente |
 | Herramientas | Gratuitas o propias; sin licencias pagas |
 
@@ -130,13 +131,14 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - WooCommerce 11.2.2 activo. Mercado Pago 8.10.0 instalado e inactivo.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
 - Tema GlowUp activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
-- Plugin `glowup-turnos` activo en versión 0.2.0 con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
+- Plugin `glowup-turnos` activo en versión 0.2.1 con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
 - Motor de agenda de la Fase 2: disponibilidad por servicio, profesional y fecha; pausas, excepciones y anticipación mínima/máxima.
 - Retención de horarios durante 15 minutos con lock por profesional, transacción, idempotencia y prevención de solapamientos.
 - API REST de disponibilidad, creación de retenciones y consulta de turnos de la clienta autenticada.
 - Agenda de bloqueos en el panel GlowUp, con filtro por profesional y alta/baja de vacaciones, feriados o ausencias.
 - Los holds vencidos se conservan como `expired` para auditoría y dejan de bloquear la disponibilidad de inmediato.
 - 29 servicios, 2 profesionales, 29 relaciones servicio-profesional y 12 bloques horarios sembrados.
+- Depilación solo definitiva: seis zonas sueltas (axilas, bozo, cavado, piernas, brazos y bikini) más un pack completo, todos con evaluación previa.
 - 18 productos en 5 categorías, con SKU, stock, descripciones y precios.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP ni desbordes horizontales.
 - Checkout con carrito real verificado: artículo, total, métodos de entrega y botón de compra.
@@ -205,3 +207,4 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | --- | --- |
 | 2026-11-08 | Cierre de Fase 0 y Fase 1; documentación inicial del proyecto. |
 | 2026-11-09 | Cierre de Fase 2: disponibilidad, excepciones, retenciones, anti-solapamiento, API REST y agenda de bloqueos. |
+| 2026-11-10 | Ajuste de negocio: ubicación en La Rioja capital, zona horaria `America/Argentina/La_Rioja` y depilación solo definitiva por zona más pack completo. Plugin 0.2.1. |

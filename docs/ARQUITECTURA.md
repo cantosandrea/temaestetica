@@ -1,7 +1,7 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.2.0
-**Actualizado:** 9 de noviembre de 2026
+**Versión:** 0.2.1
+**Actualizado:** 10 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
 ---
@@ -56,10 +56,10 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | WooCommerce | 11.2.2 |
 | Mercado Pago | Plugin oficial 8.10.0, inactivo |
 | Tema | `temaestetica` 0.1.0, marca GlowUp |
-| Plugin de reservas | `glowup-turnos` 0.2.0, DB 1.1.0 |
+| Plugin de reservas | `glowup-turnos` 0.2.1, DB 1.1.0 |
 | Prefijo de tablas | `wp_` |
 | Moneda | ARS |
-| Zona horaria | America/Argentina/La_Rioja (La Rioja capital, UTC-4) |
+| Zona horaria | America/Argentina/La_Rioja (La Rioja capital, UTC-3) |
 | Checkout | Bloques de WooCommerce |
 | Email | `wp_mail` y cron de WordPress |
 

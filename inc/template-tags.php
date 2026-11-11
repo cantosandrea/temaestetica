@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function glowup_image_defaults() {
 	return array(
 		'hero'     => GLOWUP_URI . '/assets/img/placeholder-hero.svg',
-		'about'    => GLOWUP_URI . '/assets/img/placeholder-portrait.svg',
-		'agustina' => GLOWUP_URI . '/assets/img/placeholder-portrait.svg',
-		'estela'   => GLOWUP_URI . '/assets/img/placeholder-portrait.svg',
+		'about'    => GLOWUP_URI . '/assets/img/facial.jpg',
+		'agustina' => GLOWUP_URI . '/assets/img/agustina.jpg',
+		'estela'   => GLOWUP_URI . '/assets/img/estela.jpg',
 		'shop'     => GLOWUP_URI . '/assets/img/placeholder-service.svg',
 		'booking'  => GLOWUP_URI . '/assets/img/placeholder-wide.svg',
 		'cta'      => GLOWUP_URI . '/assets/img/placeholder-wide.svg',

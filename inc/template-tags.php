@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function glowup_image_defaults() {
 	return array(
-		'hero'     => GLOWUP_URI . '/assets/img/placeholder-hero.svg',
+		'hero'     => GLOWUP_URI . '/assets/img/placeholder-hero.png',
 		'about'    => GLOWUP_URI . '/assets/img/facial.jpg',
 		'agustina' => GLOWUP_URI . '/assets/img/agustina.jpg',
 		'estela'   => GLOWUP_URI . '/assets/img/estela.jpg',

@@ -40,13 +40,13 @@ No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sir
 - El plugin expone `glowup/v1`: `GET /availability`, `POST /holds` (requiere sesión con `glowup_book_appointments` e `idempotency_key` que cumpla `^[A-Za-z0-9_-]{8,64}$`), `GET /appointments` (requiere login), más `GET /services`, `/professionals` y `/config`.
 - Versión actual del plugin: `0.2.1`, esquema `1.1.0`. La zona horaria de reservas es `America/Argentina/La_Rioja` y sale de `Settings::get('timezone')`; para fechas usá `Time`/esa configuración, no `wp_timezone()` ni la zona default de PHP.
 - La agenda operativa está en `wp-admin/admin.php?page=glowup-turnos-agenda`. Los bloqueos descuentan disponibilidad pero no cancelan turnos existentes; hay que reprogramar o cancelar a mano.
-- La concurrencia de holds se resuelve con `GET_LOCK` por profesional, transacción y consulta de solapamiento; no la reemplaces por un índice único. Los holds duran 15 minutos y los vencidos se conservan como `expired`.
-- Cualquier cambio de reservas va al repo del plugin y se commitea por separado. El tema solo consume la API.
+- La concurrencia de holds se resuelve con `GET_LOCK` por profesional, transacción y consulta de solapamiento; no la reemplaces por un índice único. Los holds duran 15 minutos por defecto (`hold_minutes`) y los vencidos se conservan como `expired`.
+- Cualquier cambio de reservas va al repo del plugin y se commitea por separado; ese repo no tiene remoto Git configurado, no intentes push. El tema solo consume la API.
 
 ## Documentación y verificación
 
 - `docs/PLAN.md` y `docs/ARQUITECTURA.md` (en español) son la referencia de alcance, modelo de datos y fases. Mantenelos sincronizados con el código; `docs/GlowUp-Proyecto.docx` es la versión formal (binaria: no la edites a mano).
-- La documentación de fases puede quedar desfasada: contrastala siempre con `glowup-turnos.php` y el código del plugin antes de asumir qué falta. La versión y el esquema actuales están en la sección de reservas.
+- La documentación de fases puede quedar desfasada: si `PLAN.md` dice que la Fase 3 está en curso, verificá `page-turnos.php` (sigue siendo “próximamente”) y contrastá siempre con `glowup-turnos.php` y el código del plugin. La versión y el esquema actuales están en la sección de reservas.
 - Antes de cerrar un cambio: `php -l` sobre los archivos tocados, WP-CLI para datos/opciones y navegador para render, consola, enlaces y responsive. No hay tests automatizados.
 - Antes de editar o commitear, mirá `git status`: el árbol puede tener trabajo del usuario (por ejemplo, fotos subidas o cambios en `inc/template-tags.php`). No lo pises ni lo incluyas en un commit sin confirmación; usá `git add` selectivo.
-- Commits atómicos. Convención: `feat(theme): ...`, `fix(theme): ...`, `docs: ...`; en el plugin, `feat(booking): ...` / `fix(booking): ...`.
+- Commits atómicos. Convención: `feat(theme): ...`, `fix(theme): ...`, `docs: ...`; en el plugin, `feat(booking): ...` / `fix(booking): ...`. No hagas push sin confirmación del usuario.

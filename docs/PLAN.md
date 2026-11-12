@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.2.1
-**Actualizado:** 10 de noviembre de 2026
-**Estado:** Fase 2 completada. La Fase 3 (wizard público y creación de orden) es el siguiente paso.
+**Versión:** 0.3.0
+**Actualizado:** 11 de noviembre de 2026
+**Estado:** Fase 2 completada. La Fase 3 (wizard público y creación de orden) es el siguiente paso. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -12,11 +12,11 @@ GlowUp es un salón de estética integral en La Rioja capital. El proyecto const
 
 1. Una vidriera de marca y contenido: servicios, equipo, políticas, preguntas frecuentes y contacto.
 2. Un motor de reservas con cuenta de cliente, pago total al reservar y políticas de cancelación y reprogramación.
-3. Una tienda WooCommerce con productos de cuidado, gift cards, retiro en el salón y envíos nacionales.
+3. Una tienda WooCommerce planificada como fase futura, con productos de cuidado, gift cards, retiro en el salón y envíos nacionales.
 
-La implementación se apoya en WordPress y WooCommerce para cuentas, catálogo, checkout y pagos. La lógica de agenda vive en un plugin propio, `glowup-turnos`, para no mezclar reglas de negocio con la presentación. El tema `temaestetica` conserva el slug técnico y muestra la marca **GlowUp**.
+La implementación se apoya en WordPress y WooCommerce para cuentas, pedidos y pagos. La lógica de agenda vive en un plugin propio, `glowup-turnos`, para no mezclar reglas de negocio con la presentación. El tema `temaestetica` conserva el slug técnico y muestra la marca **GlowUp**.
 
-El trabajo se desarrolla por fases. Al cierre de este documento están completas la base técnica, el tema, el contenido inicial, los roles, las tablas de reservas, el catálogo inicial y el motor de agenda de la Fase 2. La agenda ya calcula disponibilidad, aplica bloqueos y retiene horarios, pero todavía no acepta reservas públicas: `/turnos/` muestra un estado “próximamente” hasta que el wizard y el cobro estén listos.
+El trabajo se desarrolla por fases. Al cierre de este documento están completas la base técnica, el tema, el contenido inicial, los roles, las tablas de reservas, el catálogo interno y el motor de agenda de la Fase 2. La agenda ya calcula disponibilidad, aplica bloqueos y retiene horarios, pero todavía no acepta reservas públicas: `/turnos/` muestra un estado “próximamente” hasta que el wizard y el cobro estén listos. La tienda pública también está pausada: `/tienda/`, el carrito y el checkout de productos muestran un cartel de “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
 
 ---
 
@@ -24,7 +24,7 @@ El trabajo se desarrolla por fases. Al cierre de este documento están completas
 
 ### Objetivo general
 
-Publicar un sitio de estética integral que permita conocer los servicios del salón, reservar un turno con pago total y comprar productos, con una experiencia cuidada en mobile y escritorio.
+Publicar un sitio de estética integral que permita conocer los servicios del salón y reservar un turno con pago total, con una experiencia cuidada en mobile y escritorio. La compra online de productos queda para una fase futura, después del lanzamiento de las reservas.
 
 ### Objetivos específicos
 
@@ -32,7 +32,8 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Permitir que una clienta cree su cuenta, elija servicio, profesional, fecha y horario, y pague al reservar.
 - Evitar turnos superpuestos y liberar automáticamente los horarios retenidos que no se pagan.
 - Respetar las políticas del salón: cancelación con reembolso hasta 24 h antes y reprogramación hasta 12 h antes.
-- Vender productos con retiro en el salón o envío nacional, con precios finales que incluyen IVA.
+- Mantener la tienda pública en modo “Próximamente” durante el MVP, sin exponer productos, precios, carrito ni checkout.
+- Dejar el catálogo interno y la infraestructura de WooCommerce preparados para abrir la tienda en la Fase 8.
 - Dar al equipo un panel simple para consultar servicios, profesionales y turnos.
 - Dejar preparadas las integraciones de pago y notificaciones para cuando existan las cuentas definitivas.
 
@@ -47,7 +48,7 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Página del equipo con perfiles de Agustina y Estela.
 - Página de contacto con dirección a confirmar en La Rioja capital, horarios, email y teléfono.
 - Preguntas frecuentes y políticas de cancelación, privacidad y términos.
-- Tienda con categorías, ficha de producto, carrito, checkout y mi cuenta.
+- Tienda pública con un cartel de “Próximamente”: sin catálogo, precios, carrito ni checkout de productos durante el MVP.
 - Página de turnos con estado “próximamente” mientras el wizard no esté operativo.
 
 ### 3.2 Reservas
@@ -62,14 +63,18 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Recordatorios por email 24 horas y 2 horas antes.
 - Registro de consentimiento para datos de salud cuando el servicio lo requiera.
 
-### 3.3 Tienda
+### 3.3 Tienda (futura, fuera del MVP)
 
-- 18 productos iniciales en cinco categorías: Uñas, Cabello, Rostro, Cuerpo y depilación, Packs y gift cards.
-- Precios finales en pesos argentinos, con IVA incluido.
-- Retiro en el salón sin costo y envío nacional.
-- Gift card simple por $25.000 y un pack de servicios combinados como producto inicial.
-- Checkout por bloques de WooCommerce.
-- Mercado Pago como pasarela prevista, instalada pero inactiva hasta contar con credenciales.
+La tienda pública completa es la **Fase 8** y no forma parte del MVP. Durante el MVP:
+
+- `/tienda/` muestra solamente un cartel de “Próximamente”.
+- No se muestran productos, precios, carrito ni checkout de productos.
+- No se puede completar una compra ni acceder al carrito o al checkout: esas pantallas muestran “Próximamente”.
+- El icono del carrito se oculta del encabezado y la sección de tienda de la home se reemplaza por un aviso de “Próximamente”.
+- Los 18 productos quedan cargados como catálogo interno, sin exposición pública, para no perder el trabajo ya hecho.
+- WooCommerce sigue activo para cuentas, órdenes y el checkout de reservas de la Fase 4. Lo que se pausa es la tienda pública de productos, no el motor de cuentas.
+
+Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkout, stock, cupones, retiro en el salón, envío nacional con costos definidos, gift card, devoluciones y textos legales de compra.
 
 ### 3.4 Administración
 
@@ -96,7 +101,8 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | Reprogramación | Hasta 12 h antes |
 | Recordatorios | Solo email; WhatsApp queda cancelado |
 | Bonos y gift cards | Gift card simple incluida; sistema completo de packs/bonos después del MVP |
-| Envíos | Retiro en el salón y envío nacional |
+| Tienda pública | Pausada durante el MVP: solo cartel “Próximamente”. Tienda completa en la Fase 8, futura |
+| Envíos | Retiro en el salón y envío nacional, a definir en la Fase 8 |
 | Precios | Finales, con IVA incluido |
 | Facturación fiscal | A evaluar más adelante |
 | Idioma y moneda | Español de Argentina, ARS |
@@ -118,7 +124,8 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
-| 8. Post-MVP | Packs/bonos completos, facturación fiscal, mejoras de fidelización | Pendiente |
+| 8. Tienda online | Tienda pública completa: catálogo, carrito, checkout, envíos y gift cards | Futura |
+| 9. Post-MVP | Packs/bonos completos, facturación fiscal, mejoras de fidelización | Futura |
 
 ---
 
@@ -128,7 +135,7 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 
 - Entorno local XAMPP con WordPress, PHP 8.2 y MariaDB.
 - Backup de la base anterior en `C:\xampp\backups\esteticaweb\estetica_bd-20261108-230343.sql`.
-- WooCommerce 11.2.2 activo. Mercado Pago 8.10.0 instalado e inactivo.
+- WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 instalado e inactivo.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
 - Tema GlowUp activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
 - Plugin `glowup-turnos` activo en versión 0.2.1 con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
@@ -139,22 +146,24 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Los holds vencidos se conservan como `expired` para auditoría y dejan de bloquear la disponibilidad de inmediato.
 - 29 servicios, 2 profesionales, 29 relaciones servicio-profesional y 12 bloques horarios sembrados.
 - Depilación solo definitiva: seis zonas sueltas (axilas, bozo, cavado, piernas, brazos y bikini) más un pack completo, todos con evaluación previa.
-- 18 productos en 5 categorías, con SKU, stock, descripciones y precios.
-- Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP ni desbordes horizontales.
-- Checkout con carrito real verificado: artículo, total, métodos de entrega y botón de compra.
-- Sincronización del contador del carrito corregida para el carrito por bloques.
+- 18 productos en 5 categorías, con SKU, stock, descripciones y precios, cargados como catálogo interno.
+- Tienda pública pausada con una plantilla propia: `/tienda/`, las fichas de producto, `/carrito/` y el checkout de productos muestran “Muy pronto” a las visitantes. Administradoras y encargadas de tienda siguen viendo la tienda real para gestionarla.
+- Home y encabezado adaptados a la pausa: la sección de tienda se reemplaza por un aviso de “Próximamente” y el icono del carrito se oculta a las visitantes.
+- Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP ni desbordes horizontales. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
+- Checkout con carrito real verificado con una cuenta de gestión: artículo, total, métodos de entrega y botón de compra.
+- Sincronización del contador del carrito corregida para el carrito por bloques; el contador queda oculto mientras la tienda pública está pausada.
 - Datos de prueba de la Fase 2 limpiados: 0 turnos y 0 bloqueos al cierre.
 
-### En curso
+### Próximo paso
 
-- Preparación de la Fase 3: wizard público, creación de la orden WooCommerce y conexión con el checkout.
+- Fase 3: wizard público de reserva y creación de la orden WooCommerce. Todavía no está iniciada; requiere confirmación explícita para arrancar.
 
 ### Bloqueado o pendiente de terceros
 
 - Credenciales de Mercado Pago para probar checkout, webhooks y reembolsos.
 - Fotos reales, logo y textos legales definitivos.
 - Hosting, dominio y correo de producción.
-- Definición de costos de envío y dirección exacta del salón.
+- Costos de envío y dirección exacta del salón, necesarios para abrir la tienda en la Fase 8.
 
 ---
 
@@ -166,7 +175,8 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - El pago total acredita el turno y envía confirmación por email.
 - La clienta puede cancelar con reembolso hasta 24 h antes y reprogramar hasta 12 h antes.
 - Los recordatorios se envían 24 h y 2 h antes, sin duplicados.
-- La tienda permite retiro y envío nacional, con totales correctos.
+- La tienda pública muestra solo “Próximamente” y no expone productos, precios, carrito ni checkout de productos.
+- El checkout de una reserva funciona sin abrir la tienda de productos.
 - El panel muestra los turnos próximos y sus estados.
 - No hay errores de PHP, console ni desbordes en mobile y escritorio.
 - Las políticas y el consentimiento de datos de salud son visibles antes de reservar.
@@ -185,19 +195,21 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | Emails que caen en spam | Clientas sin recordatorio | Configurar SPF/DKIM en producción y probar entregabilidad |
 | Textos legales provisorios | Riesgo de cumplimiento | Revisión legal antes de publicar |
 | Actualizaciones de WooCommerce | Ruptura de integraciones | Staging, versiones fijas y pruebas de regresión |
-| Costos de envío sin definir | Totales incorrectos | Configurar tarifas antes de abrir la tienda |
+| Costos de envío sin definir | Totales incorrectos cuando abra la tienda | Configurar tarifas antes de iniciar la Fase 8 |
+| Tienda pública expuesta por error | Se promete una compra que aún no existe | Prueba del cartel “Próximamente” sin sesión y con cuenta de gestión antes de publicar |
 
 ---
 
 ## 9. Próximos pasos
 
-1. Construir el wizard público de reserva y el flujo de cuenta en `/turnos/`.
-2. Crear la orden de WooCommerce al confirmar la retención y asociarla al turno.
-3. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno.
-4. Implementar emails transaccionales y recordatorios.
-5. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios.
+1. Construir el wizard público de reserva y el flujo de cuenta en `/turnos/` (Fase 3).
+2. Crear la orden de WooCommerce al confirmar la retención y asociarla al turno (Fase 3).
+3. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno (Fase 4).
+4. Implementar emails transaccionales y recordatorios (Fase 5).
+5. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios (Fase 6).
 6. Reemplazar placeholders con fotos y cerrar textos legales.
-7. Ejecutar QA integral y preparar el despliegue a producción.
+7. Ejecutar QA integral y preparar el despliegue a producción (Fase 7).
+8. Recién después del lanzamiento, abrir la tienda pública como Fase 8.
 
 ---
 
@@ -208,3 +220,4 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 | 2026-11-08 | Cierre de Fase 0 y Fase 1; documentación inicial del proyecto. |
 | 2026-11-09 | Cierre de Fase 2: disponibilidad, excepciones, retenciones, anti-solapamiento, API REST y agenda de bloqueos. |
 | 2026-11-10 | Ajuste de negocio: ubicación en La Rioja capital, zona horaria `America/Argentina/La_Rioja` y depilación solo definitiva por zona más pack completo. Plugin 0.2.1. |
+| 2026-11-11 | Reorganización de fases: la tienda pública pasa a la Fase 8 (futura) y Post-MVP a la Fase 9. Durante el MVP, tienda, carrito y checkout de productos muestran “Próximamente”. WooCommerce sigue activo para cuentas y órdenes de reservas. |

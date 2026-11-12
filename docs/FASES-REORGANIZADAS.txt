@@ -1,0 +1,375 @@
+============================================================
+GLOWUP — FASES REORGANIZADAS
+============================================================
+
+Actualizado: 11 de noviembre de 2026
+Criterio: lanzar primero el sitio de marca y las reservas con pago.
+La tienda online pasa a una fase futura y, durante el MVP, solo
+muestra un cartel de "Próximamente".
+
+------------------------------------------------------------
+RESUMEN
+------------------------------------------------------------
+
+Fase 0   Descubrimiento                        Completada
+Fase 1   Base técnica                          Completada
+Fase 2   Motor de agenda                       Completada
+Fase 3   Wizard de reserva y cuenta            Siguiente
+Fase 4   Pagos                                 Bloqueada por credenciales
+Fase 5   Emails                                Pendiente
+Fase 6   Operación                             Pendiente
+Fase 7   QA y lanzamiento                      Pendiente
+Fase 8   Tienda online                         Futura (solo "Próximamente")
+Fase 9   Post-MVP                              Futura
+
+La Fase 8 no se elimina: se conserva como fase futura. Lo que se
+reduce es su alcance dentro del MVP. La tienda completa no se
+implementa ni se abre al público hasta después de cerrar las
+Fases 3 a 7.
+
+------------------------------------------------------------
+FASE 0 — DESCUBRIMIENTO
+------------------------------------------------------------
+
+Estado: completada.
+
+Objetivo:
+Definir el negocio, el alcance, las decisiones cerradas y el stack.
+
+Alcance:
+- Relevamiento de servicios, profesionales y forma de trabajo.
+- Definición de políticas de reserva, cancelación y reprogramación.
+- Definición de la identidad GlowUp y del alcance del MVP.
+- Elección de WordPress + WooCommerce + plugin propio de agenda.
+- Definición de la ubicación en La Rioja capital.
+
+Criterio de cierre:
+Decisiones de negocio y alcance documentados.
+
+------------------------------------------------------------
+FASE 1 — BASE TÉCNICA
+------------------------------------------------------------
+
+Estado: completada.
+
+Objetivo:
+Dejar funcionando la base del sitio y la infraestructura de cuentas,
+sin abrir todavía la tienda pública.
+
+Alcance:
+- Entorno local XAMPP con WordPress, PHP y MariaDB.
+- Tema propio `temaestetica`, con marca visible GlowUp.
+- Plugin base `glowup-turnos`.
+- Páginas de Inicio, Servicios, Nosotras, Contacto, Turnos, Tienda,
+  Carrito, Finalizar compra y Mi cuenta.
+- Menús, configuración regional es_AR, moneda ARS y precios con IVA.
+- WooCommerce instalado y configurado como infraestructura de cuentas
+  y órdenes. No se considera "tienda abierta" en esta fase.
+- 18 productos cargados como catálogo base interno, sin exponerlos al
+  público durante el MVP.
+- Páginas legales provisorias.
+- Backup inicial de la base.
+
+Criterio de cierre:
+Sitio navegable, cuentas operativas y base de WooCommerce lista para
+crear órdenes de reservas. La tienda pública queda fuera del MVP.
+
+------------------------------------------------------------
+FASE 2 — MOTOR DE AGENDA
+------------------------------------------------------------
+
+Estado: completada.
+
+Objetivo:
+Resolver la disponibilidad real de turnos y evitar superposiciones.
+
+Alcance:
+- Servicios y profesionales en tablas propias (`wp_glowup_*`).
+- 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
+- Disponibilidad por servicio, profesional y fecha.
+- Pausas, excepciones, vacaciones, feriados y ausencias.
+- Retención de horarios durante 15 minutos.
+- Prevención de solapamientos con `GET_LOCK` por profesional,
+  transacción y revalidación.
+- Idempotencia para evitar reservas duplicadas.
+- API REST `glowup/v1`: disponibilidad, holds, turnos, servicios,
+  profesionales y configuración.
+- Agenda de bloqueos en el panel de administración.
+- Holds vencidos conservados como `expired`.
+
+Criterio de cierre:
+Motor de disponibilidad y retenciones probado, sin turnos ni bloqueos
+de prueba al cierre.
+
+------------------------------------------------------------
+FASE 3 — WIZARD DE RESERVA Y CUENTA
+------------------------------------------------------------
+
+Estado: siguiente. No iniciada.
+
+Objetivo:
+Permitir que una clienta se registre, elija un turno y genere una
+orden de WooCommerce sin cobrar todavía.
+
+Alcance:
+- Reemplazar el "Próximamente" de `/turnos/` por el wizard público.
+- Registro e ingreso de clientas con rol `customer`.
+- Selección de servicio, profesional, fecha y horario.
+- Consulta de disponibilidad contra `glowup/v1`.
+- Creación de la retención del horario.
+- Creación de la orden de WooCommerce asociada al turno.
+- Resumen previo al pago con servicio, profesional, fecha, hora,
+  duración y precio.
+- Manejo de errores: horario ocupado, retención vencida, sesión
+  vencida y doble envío.
+- Accesibilidad y comportamiento mobile.
+
+Dependencias:
+Fase 2 cerrada.
+
+Criterio de cierre:
+Una clienta autenticada puede elegir un horario disponible, retenerlo
+y llegar al resumen de pago sin errores ni superposiciones.
+
+------------------------------------------------------------
+FASE 4 — PAGOS
+------------------------------------------------------------
+
+Estado: bloqueada por credenciales de Mercado Pago.
+
+Objetivo:
+Cobrar el total del turno al reservar y confirmar la reserva cuando
+el pago se acredite.
+
+Alcance:
+- Integración de Mercado Pago en sandbox.
+- Checkout de WooCommerce conectado a la orden de reserva.
+- Webhooks de pago, estados pendiente, aprobado, rechazado y
+  reembolsado.
+- Confirmación automática del turno al acreditarse el pago.
+- Liberación del horario si el pago no se completa.
+- Reembolsos por cancelación dentro del plazo de 24 horas.
+- Conciliación entre orden, pago y turno.
+- Pruebas de pago aprobado, rechazado, expirado y reembolsado.
+
+Dependencias:
+Fase 3 cerrada y credenciales de Mercado Pago disponibles.
+
+Criterio de cierre:
+Un turno pagado queda confirmado y uno no pagado libera el horario.
+
+------------------------------------------------------------
+FASE 5 — EMAILS
+------------------------------------------------------------
+
+Estado: pendiente.
+
+Objetivo:
+Avisar a la clienta y al salón en cada cambio relevante del turno.
+
+Alcance:
+- Confirmación de reserva.
+- Cancelación y reprogramación.
+- Recordatorio 24 horas antes.
+- Recordatorio 2 horas antes.
+- Copia interna al email del salón.
+- Plantillas con la identidad GlowUp.
+- Configuración SMTP para producción.
+- SPF y DKIM.
+- Prevención de envíos duplicados.
+
+Dependencias:
+Fases 3 y 4 cerradas.
+
+Criterio de cierre:
+Los emails se envían una sola vez, con los datos correctos y sin caer
+en spam en una prueba real.
+
+------------------------------------------------------------
+FASE 6 — OPERACIÓN
+------------------------------------------------------------
+
+Estado: pendiente.
+
+Objetivo:
+Dar al equipo una agenda cómoda para el día a día.
+
+Alcance:
+- Vista diaria y semanal de turnos.
+- Edición de horarios semanales por profesional.
+- Alta y baja de vacaciones, feriados y ausencias.
+- Cambio de estado de turnos.
+- Notas internas.
+- Cancelación y reprogramación manual.
+- Filtros por profesional y fecha.
+- Permisos para el rol `glowup_professional`.
+
+Dependencias:
+Fases 3 y 4 cerradas.
+
+Criterio de cierre:
+El equipo puede operar la agenda sin tocar la base de datos ni pedir
+intervención técnica.
+
+------------------------------------------------------------
+FASE 7 — QA Y LANZAMIENTO
+------------------------------------------------------------
+
+Estado: pendiente.
+
+Objetivo:
+Publicar el sitio y las reservas en producción con un riesgo controlado.
+
+Alcance:
+- Pruebas integrales del flujo de reserva y pago.
+- Pruebas de cancelación, reprogramación y reembolso.
+- Revisión de accesibilidad, performance y responsive.
+- Revisión de textos legales y consentimiento de datos de salud.
+- Configuración de hosting, dominio y correo de producción.
+- Backup, monitoreo y plan de rollback.
+- Reemplazo de fotos y logo provisorios.
+- Cierre de la tienda pública: solo cartel "Próximamente".
+
+Dependencias:
+Fases 3 a 6 cerradas.
+
+Criterio de cierre:
+Reservas y pagos funcionando en producción, con la tienda pública
+en pausa y un cartel claro de "Próximamente".
+
+------------------------------------------------------------
+FASE 8 — TIENDA ONLINE (FUTURA)
+------------------------------------------------------------
+
+Estado: futura. No se inicia hasta cerrar la Fase 7.
+
+Objetivo:
+Abrir la tienda pública después del lanzamiento de las reservas.
+
+Esta fase no se estima ni se implementa ahora: solo se deja identificada
+como trabajo futuro. Durante el MVP no se avanza con catálogo, carrito
+ni checkout de productos.
+
+Durante el MVP:
+- `/tienda/` muestra solamente un cartel de "Próximamente".
+- No se muestran productos, precios, carrito ni checkout de la tienda.
+- No se puede completar una compra ni acceder al carrito o al checkout:
+  esas pantallas muestran "Próximamente".
+- El icono del carrito se oculta del encabezado y la sección de tienda de la home se reemplaza por un aviso de "Próximamente".
+- Los 18 productos pueden quedar cargados internamente, ocultos,
+  para no perder el trabajo ya hecho.
+- WooCommerce sigue activo para cuentas y órdenes de reservas; lo que
+  se pausa es la tienda pública, no el motor de cuentas.
+- La pausa aplica a la compra de productos. El checkout de una reserva
+  se habilita en la Fase 4 y no se considera parte de la tienda.
+
+Alcance futuro:
+- Catálogo público con categorías y fichas de producto.
+- Carrito y checkout por bloques.
+- Stock, variaciones y cupones.
+- Retiro en el salón sin costo.
+- Envío nacional con costos definidos.
+- Gift card simple.
+- Devoluciones y cambios.
+- Integración de pago de la tienda.
+- Textos legales de compra y envío.
+
+Dependencias:
+- Costos de envío y logística definidos.
+- Fotos reales de productos.
+- Textos legales de compra, envío y devoluciones.
+- Stock y responsable de preparación de pedidos.
+- Mercado Pago en producción.
+- Fases 3 a 7 cerradas.
+
+Criterio de cierre:
+La tienda permite comprar, cobrar, retirar o enviar, y gestionar
+pedidos sin afectar la agenda de turnos.
+
+------------------------------------------------------------
+FASE 9 — POST-MVP (FUTURA)
+------------------------------------------------------------
+
+Estado: futura.
+
+Objetivo:
+Mejorar el negocio después de validar reservas y tienda.
+
+Alcance:
+- Packs y bonos de servicios.
+- Facturación fiscal.
+- Programa de fidelización.
+- Mejoras de conversión y recordatorios.
+- Automatizaciones y reportes.
+- Otras integraciones.
+
+Dependencias:
+Fases 7 y 8 cerradas y negocio validado.
+
+------------------------------------------------------------
+REGLA DE ORO
+------------------------------------------------------------
+
+La tienda no bloquea el lanzamiento de las reservas. Primero se cierra
+el flujo de turnos con pago; después se abre la tienda.
+
+Esta pausa es solo para la compra de productos. WooCommerce sigue
+siendo la infraestructura de cuentas y órdenes de reservas; el
+checkout de una reserva se habilita en la Fase 4 y no debe
+confundirse con la tienda.
+
+Mientras la tienda esté en pausa:
+- No prometer compras online desde la home ni desde el menú.
+- No mostrar precios ni botones de compra de productos.
+- No enviar tráfico de compras a `/carrito/` ni a `/finalizar-compra/`.
+- Mantener visible el cartel de "Próximamente" en `/tienda/`.
+
+------------------------------------------------------------
+ESTADO ACTUAL
+------------------------------------------------------------
+
+Completado:
+- Fases 0, 1 y 2.
+- WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
+- Tema GlowUp y plugin `glowup-turnos` 0.2.1, esquema 1.1.0.
+- 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
+- 18 productos cargados como catálogo interno.
+- API de disponibilidad, holds y turnos.
+- Agenda de bloqueos en el panel.
+- Tienda pública pausada: `/tienda/`, fichas de producto, carrito y
+  checkout de productos muestran "Muy pronto". Home y encabezado
+  adaptados a la pausa.
+
+Nota sobre la tienda:
+- La tienda está técnicamente armada y ahora pausada en el entorno local.
+- Esta reorganización define que la tienda pública pase a "Próximamente"
+  antes del lanzamiento. No se eliminan productos ni WooCommerce.
+- La base técnica de la tienda sigue siendo parte de la Fase 1; la
+  tienda pública completa es la Fase 8.
+
+Siguiente:
+- Fase 3: wizard público de reserva y creación de la orden.
+
+Bloqueado:
+- Fase 4: credenciales de Mercado Pago.
+
+Pendiente de terceros:
+- Fotos y logo definitivos.
+- Textos legales definitivos.
+- Hosting, dominio y correo de producción.
+- Costos de envío y dirección exacta del salón.
+
+------------------------------------------------------------
+PRÓXIMOS PASOS
+------------------------------------------------------------
+
+1. Construir la Fase 3: wizard de reserva y cuenta.
+2. Integrar Mercado Pago en sandbox cuando estén las credenciales.
+3. Implementar emails transaccionales.
+4. Completar la agenda operativa del panel.
+5. Ejecutar QA, cargar fotos y textos legales, y lanzar.
+6. Recién después, abrir la tienda online como Fase 8.
+
+============================================================
+Fin del documento.
+============================================================

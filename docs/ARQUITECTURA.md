@@ -1,7 +1,7 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.2.1
-**Actualizado:** 10 de noviembre de 2026
+**Versión:** 0.3.0
+**Actualizado:** 11 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
 ---
@@ -23,9 +23,9 @@
 │  └───────────┬────────────┘        └──────────────┬──────────────┘  │
 │              │                                    │                 │
 │              │            ┌───────────────────────▼──────────────┐  │
-│              │            │ WooCommerce 11.2.2                   │  │
-│              └───────────►│ Cuentas · Catálogo · Carrito         │  │
-│                           │ Checkout · Pedidos · Reembolsos      │  │
+│              │            │ WooCommerce 11.3.0                   │  │
+│              └───────────►│ Cuentas · Pedidos · Pagos            │  │
+│                           │ Tienda pública pausada (Fase 8)      │  │
 │                           └───────────────────┬──────────────────┘  │
 │                                               │                     │
 │                           ┌───────────────────▼──────────────────┐  │
@@ -39,9 +39,9 @@ El sitio se apoya en tres capas:
 
 - **Presentación:** tema `temaestetica`, que muestra la marca GlowUp y consume datos de servicios y profesionales cuando el plugin está activo.
 - **Negocio:** plugin `glowup-turnos`, dueño de la agenda, la disponibilidad, las políticas y la persistencia de turnos.
-- **Comercio:** WooCommerce para cuentas, productos, pedidos, checkout y pagos; Mercado Pago como pasarela prevista.
+- **Comercio:** WooCommerce para cuentas, órdenes, pagos y checkout de reservas; Mercado Pago como pasarela prevista. La tienda pública de productos está pausada durante el MVP y se abre en la Fase 8.
 
-La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper la tienda. El tema degrada a contenido de ejemplo si el plugin no está presente.
+La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper las cuentas ni los pedidos. El tema degrada a contenido de ejemplo si el plugin no está presente. La pausa de la tienda es solo de la vidriera pública de productos: las cuentas y los pedidos siguen operativos; el checkout de reservas se habilitará en la Fase 4 y deberá exceptuarse de la pausa.
 
 ---
 
@@ -53,7 +53,7 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | PHP | 8.2.12 |
 | Base de datos | MariaDB 10.4.32, puerto 3307 |
 | Servidor local | XAMPP en Windows |
-| WooCommerce | 11.2.2 |
+| WooCommerce | 11.3.0 |
 | Mercado Pago | Plugin oficial 8.10.0, inactivo |
 | Tema | `temaestetica` 0.1.0, marca GlowUp |
 | Plugin de reservas | `glowup-turnos` 0.2.1, DB 1.1.0 |
@@ -88,6 +88,7 @@ temaestetica/
 ├── page-nosotras.php         Equipo
 ├── page-contacto.php         Contacto y FAQ
 ├── page-turnos.php           Estado del wizard (próximamente)
+├── coming-soon.php           Pantalla de tienda “Próximamente”
 ├── front-page.php            Inicio
 ├── header.php / footer.php
 ├── woocommerce.php           Wrapper de WooCommerce
@@ -121,6 +122,18 @@ Si existen, consume servicios activos y profesionales activos; si no, usa el con
 - Badge del carrito con fragmento AJAX clásico y sincronización con el Store API para el carrito por bloques.
 - Ajustes de encabezado de tienda, categorías y ficha de producto.
 - Estilos de carrito y checkout por bloques integrados con la paleta.
+
+### 3.5 Pausa de la tienda pública
+
+La tienda pública es la Fase 8. Mientras el MVP no la abra, `inc/woocommerce.php` aplica una pausa de vidriera:
+
+- `glowup_store_is_coming_soon()` devuelve `true` por defecto y se puede filtrar con `glowup_store_coming_soon`.
+- `glowup_store_is_public_page()` identifica tienda, ficha de producto, taxonomías de producto, carrito y checkout.
+- `glowup_store_coming_soon_template()` engancha en `template_include` (prioridad 99) y reemplaza esas pantallas por `coming-soon.php`.
+- Las cuentas con `manage_woocommerce` (administradoras y encargadas de tienda) siguen viendo la tienda real para gestionar productos y probar el checkout.
+- El encabezado oculta el icono del carrito a las visitantes y la sección de tienda de la home se reemplaza por un aviso de “Próximamente”.
+- `/mi-cuenta/` no se interviene: las cuentas siguen disponibles para reservar y consultar turnos.
+- El checkout de una orden de reserva de la Fase 4 deberá exceptuarse explícitamente de esta pausa cuando se implemente; hoy ese flujo todavía no existe.
 
 ---
 
@@ -351,13 +364,14 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - Las credenciales de producción todavía no están disponibles. El plugin está instalado e inactivo.
 - No se deben commitear credenciales; se cargan en la configuración de WooCommerce o en constantes de `wp-config.php`.
 
-### 7.3 Productos y envíos
+### 7.3 Productos y tienda futura
 
-- 18 productos simples en cinco categorías.
-- Precios finales con IVA incluido.
+- El catálogo interno tiene 18 productos simples en cinco categorías, con precios finales y IVA incluido.
 - Stock gestionado en productos físicos; gift card virtual sin stock.
-- Zona de envío nacional y retiro en el salón sin costo.
-- El costo de envío definitivo queda pendiente de definición.
+- Los productos no se exponen al público durante el MVP: tienda, fichas, carrito y checkout de productos muestran “Próximamente”.
+- La tienda pública completa, con retiro en el salón y envío nacional, es la Fase 8 y queda fuera del MVP.
+- El costo de envío definitivo y los textos legales de compra quedan pendientes para esa fase.
+- WooCommerce sigue siendo la infraestructura de cuentas y órdenes; la pausa no desactiva el motor de cuentas. El checkout de reservas de la Fase 4 deberá exceptuarse de la pausa.
 
 ---
 
@@ -367,7 +381,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 | --- | --- | --- |
 | `administrator` | Agustina / administración | Todas las capacidades GlowUp y WooCommerce |
 | `glowup_professional` | Estela / Agustina | Ver turnos, gestionar su agenda, subir archivos |
-| `customer` | Clientas | Comprar, reservar, ver sus turnos |
+| `customer` | Clientas | Reservar y ver sus turnos; comprar cuando la tienda abra en la Fase 8 |
 
 Capacidades propias:
 
@@ -489,9 +503,11 @@ chore: ...
 - Emails reales y recordatorios: Fase 5.
 - CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
 - Agenda operativa con vista diaria/semanal: Fase 6.
+- Apertura de la tienda pública completa: Fase 8.
 - Tests automatizados y CI: posterior al MVP.
 - Estilos finos del checkout por bloques y del email: posterior.
-- Costos de envío y dirección exacta: negocio.
+- Costos de envío, logística y dirección exacta: negocio, para la Fase 8.
+- Textos legales de compra, envío y devoluciones: Fase 8.
 - Textos legales definitivos y facturación: negocio/legal.
 - Fotos y logo definitivos: contenido.
 - Los turnos vencidos se conservan como `expired` para auditoría; revisar la política de retención de datos antes de producción.

@@ -5,6 +5,24 @@
  * @package GlowUp
  */
 
+if ( glowup_store_is_coming_soon() ) :
+	?>
+	<section class="section shop-section" id="tienda">
+		<div class="container">
+			<div class="gift-callout shop-coming-soon">
+				<div class="shop-coming-soon__copy">
+					<p class="kicker"><?php esc_html_e( 'La tienda', 'temaestetica' ); ?></p>
+					<h3><?php esc_html_e( 'La tienda online está en camino.', 'temaestetica' ); ?></h3>
+					<p><?php esc_html_e( 'Estamos preparando una selección de productos para que el cuidado siga en casa. Muy pronto vas a poder comprarlos online.', 'temaestetica' ); ?></p>
+				</div>
+				<a class="btn btn--ghost" href="<?php echo esc_url( glowup_shop_url() ); ?>"><?php esc_html_e( 'Ver novedades', 'temaestetica' ); ?></a>
+			</div>
+		</div>
+	</section>
+	<?php
+	return;
+endif;
+
 $glowup_categories = glowup_get_shop_categories();
 ?>
 <section class="section shop-section" id="tienda">

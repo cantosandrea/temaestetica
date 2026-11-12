@@ -1351,6 +1351,17 @@ button {
 	flex: 0 0 auto;
 }
 
+.shop-coming-soon {
+	align-items: flex-start;
+}
+
+.shop-coming-soon__copy p:not(.kicker) {
+	max-width: 58ch;
+	margin: 0.6rem 0 0;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
 /* ---------- Testimonials ---------- */
 
 .testimonials-section {

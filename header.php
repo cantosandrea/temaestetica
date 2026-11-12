@@ -24,11 +24,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 <header class="site-header" data-site-header>
 	<div class="announcement">
 		<div class="container announcement__inner">
-			<span><?php esc_html_e( 'Envíos a todo el país', 'temaestetica' ); ?></span>
-			<span aria-hidden="true">·</span>
-			<span><?php esc_html_e( 'Retiro en el salón', 'temaestetica' ); ?></span>
-			<span aria-hidden="true">·</span>
-			<span><?php esc_html_e( 'Reservá tu turno online', 'temaestetica' ); ?></span>
+			<?php if ( glowup_store_is_coming_soon() ) : ?>
+				<span><?php esc_html_e( 'Reservá tu turno online', 'temaestetica' ); ?></span>
+				<span aria-hidden="true">·</span>
+				<span><?php esc_html_e( 'La Rioja capital', 'temaestetica' ); ?></span>
+				<span aria-hidden="true">·</span>
+				<span><?php esc_html_e( 'Depilación definitiva', 'temaestetica' ); ?></span>
+			<?php else : ?>
+				<span><?php esc_html_e( 'Envíos a todo el país', 'temaestetica' ); ?></span>
+				<span aria-hidden="true">·</span>
+				<span><?php esc_html_e( 'Retiro en el salón', 'temaestetica' ); ?></span>
+				<span aria-hidden="true">·</span>
+				<span><?php esc_html_e( 'Reservá tu turno online', 'temaestetica' ); ?></span>
+			<?php endif; ?>
 		</div>
 	</div>
 
@@ -53,10 +61,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<a class="header-icon" href="<?php echo esc_url( glowup_account_url() ); ?>" aria-label="<?php esc_attr_e( 'Mi cuenta', 'temaestetica' ); ?>">
 				<?php echo glowup_icon( 'user' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
-			<a class="header-icon header-icon--cart" href="<?php echo esc_url( glowup_cart_url() ); ?>" aria-label="<?php esc_attr_e( 'Carrito', 'temaestetica' ); ?>">
-				<?php echo glowup_icon( 'bag' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<span class="cart-count<?php echo glowup_cart_count() ? '' : ' is-empty'; ?>" data-cart-count><?php echo esc_html( glowup_cart_count() ); ?></span>
-			</a>
+			<?php if ( ! glowup_store_is_coming_soon() || current_user_can( 'manage_woocommerce' ) ) : ?>
+				<a class="header-icon header-icon--cart" href="<?php echo esc_url( glowup_cart_url() ); ?>" aria-label="<?php esc_attr_e( 'Carrito', 'temaestetica' ); ?>">
+					<?php echo glowup_icon( 'bag' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<span class="cart-count<?php echo glowup_cart_count() ? '' : ' is-empty'; ?>" data-cart-count><?php echo esc_html( glowup_cart_count() ); ?></span>
+				</a>
+			<?php endif; ?>
 			<a class="btn btn--small header-cta" href="<?php echo esc_url( glowup_booking_url() ); ?>"><?php esc_html_e( 'Reservar', 'temaestetica' ); ?></a>
 			<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-nav-toggle>
 				<span class="nav-toggle__open"><?php echo glowup_icon( 'menu' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>

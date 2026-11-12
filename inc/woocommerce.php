@@ -9,9 +9,62 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Whether the public storefront is paused behind a "coming soon" screen.
+ *
+ * WooCommerce stays active for accounts, orders and booking payments. Only
+ * the public product catalog, cart and store checkout are paused.
+ *
+ * @return bool
+ */
+function glowup_store_is_coming_soon() {
+	return (bool) apply_filters( 'glowup_store_coming_soon', true );
+}
+
 if ( ! class_exists( 'WooCommerce' ) ) {
 	return;
 }
+
+/**
+ * Whether the current request belongs to the public storefront.
+ *
+ * @return bool
+ */
+function glowup_store_is_public_page() {
+	return is_shop()
+		|| is_product()
+		|| is_product_taxonomy()
+		|| is_cart()
+		|| is_checkout();
+}
+
+/**
+ * Replace public store templates with the GlowUp "coming soon" screen.
+ *
+ * Shop managers and administrators keep seeing the real store so they can
+ * prepare products and test checkout.
+ *
+ * @param string $template Template path.
+ * @return string
+ */
+function glowup_store_coming_soon_template( $template ) {
+	if ( is_admin() || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return $template;
+	}
+
+	if ( ! glowup_store_is_coming_soon() || ! glowup_store_is_public_page() ) {
+		return $template;
+	}
+
+	if ( current_user_can( 'manage_woocommerce' ) ) {
+		return $template;
+	}
+
+	$coming_soon = locate_template( 'coming-soon.php' );
+
+	return $coming_soon ? $coming_soon : $template;
+}
+add_filter( 'template_include', 'glowup_store_coming_soon_template', 99 );
 
 remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
 remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );

@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.4.0
-**Actualizado:** 12 de noviembre de 2026
-**Estado:** Fase 3 completada. La Fase 4 (pagos) es el siguiente paso, bloqueada por credenciales de Mercado Pago. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Versión:** 0.5.0
+**Actualizado:** 13 de noviembre de 2026
+**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: la guarda de pago, el mapeo orden→turno y la conciliación de retenciones vencidas ya están implementados; la activación de Mercado Pago y las pruebas end-to-end siguen bloqueadas por credenciales. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -16,7 +16,7 @@ GlowUp es un salón de estética integral en La Rioja capital. El proyecto const
 
 La implementación se apoya en WordPress y WooCommerce para cuentas, pedidos y pagos. La lógica de agenda vive en un plugin propio, `glowup-turnos`, para no mezclar reglas de negocio con la presentación. El tema `temaestetica` conserva el slug técnico y muestra la marca **GlowUp**.
 
-El trabajo se desarrolla por fases. La Fase 3 ya está cerrada: `/turnos/` permite crear una cuenta o iniciar sesión, elegir servicio, profesional, fecha y horario, retener el lugar por 15 minutos y generar una orden de WooCommerce asociada al turno. **Todavía no se cobra**: la orden queda pendiente de pago y el checkout online se habilita en la Fase 4. La tienda pública de productos sigue pausada: `/tienda/`, las fichas de producto, el carrito y el checkout de productos muestran “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
+El trabajo se desarrolla por fases. La Fase 3 está cerrada: `/turnos/` permite crear una cuenta o iniciar sesión, elegir servicio, profesional, fecha y horario, retener el lugar por 15 minutos y generar una orden de WooCommerce asociada al turno. La Fase 4 ya empezó: el plugin bloquea el pago cuando la retención venció, confirma el turno al acreditarse la orden, libera el turno al cancelar o reembolsar y concilia las órdenes pendientes cuyos holds expiraron. **Todavía no se cobra**: Mercado Pago sigue inactivo y sin credenciales, y el tema solo muestra el botón real de pago cuando detecta una pasarela disponible. La tienda pública de productos sigue pausada: `/tienda/`, las fichas de producto, el carrito y el checkout de productos muestran “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
 
 ---
 
@@ -58,8 +58,11 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Selección de servicio, profesional, fecha y horario.
 - Consulta de disponibilidad contra la API del plugin y creación de una retención de 15 minutos.
 - Creación automática de una orden de WooCommerce asociada al turno, en estado pendiente de pago.
-- Pago total al reservar. La seña queda configurada como opción futura, no como modo activo.
-- Confirmación automática al acreditarse el pago (Fase 4).
+- Pago total al reservar. La seña queda configurada como opción futura, no como modo activo. El cobro se realiza con Mercado Pago cuando la pasarela esté configurada; mientras no haya credenciales, no se ofrece ningún medio de pago.
+- Confirmación automática al acreditarse el pago, implementada en la Fase 4.
+- Guarda server-side que impide pagar una orden cuya retención venció o cuyo turno ya no está pendiente.
+- Conciliación de órdenes pendientes: si la retención vence sin pago, el turno pasa a `expired` y la orden se cancela.
+- Pago tardío: si el horario sigue libre y el turno es futuro, se confirma; si ya está ocupado o el turno fue cancelado, la orden queda marcada para revisión manual y reembolso.
 - Cancelación con reembolso hasta 24 horas antes del turno (pendiente de implementación).
 - Reprogramación hasta 12 horas antes del turno (pendiente de implementación).
 - Recordatorios por email 24 horas y 2 horas antes (Fase 5).
@@ -76,7 +79,7 @@ La tienda pública completa es la **Fase 8** y no forma parte del MVP. Durante e
 - El icono del carrito se oculta del encabezado y la sección de tienda de la home se reemplaza por un aviso de “Próximamente”.
 - Los 18 productos quedan cargados como catálogo interno, sin exposición pública, para no perder el trabajo ya hecho.
 - WooCommerce sigue activo para cuentas, órdenes y el checkout de reservas de la Fase 4. Lo que se pausa es la tienda pública de productos, no el motor de cuentas.
-- La pantalla de pago de una orden de reserva se exceptúa de la pausa para que el flujo pueda revisarse y completarse en la Fase 4.
+- La pantalla de pago de una orden de reserva se exceptúa de la pausa. Mientras Mercado Pago no esté configurado muestra un aviso y no ofrece cobro; cuando la pasarela esté disponible, habilita el pago real del turno.
 
 Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkout, stock, cupones, retiro en el salón, envío nacional con costos definidos, gift card, devoluciones y textos legales de compra.
 
@@ -101,7 +104,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | Cobro | Pago total al reservar; la seña queda como opción futura |
 | Pasarela | Mercado Pago mediante el plugin oficial |
 | Retención de horario | 15 minutos mientras se completa el pago |
-| Orden de reserva | Se crea en la Fase 3 sin cobro, queda `pending` y se asocia al turno |
+| Orden de reserva | Se crea sin cobro, queda `pending` y se asocia al turno; el pago se habilita cuando la pasarela está disponible |
 | Cancelación | Hasta 24 h antes con reembolso; fuera de plazo, sin reembolso |
 | Reprogramación | Hasta 12 h antes |
 | Recordatorios | Solo email; WhatsApp queda cancelado |
@@ -125,7 +128,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 1. Base técnica | Entorno local, backup, WooCommerce, tema, plugin base, contenido y tienda inicial | Completada |
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
 | 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
-| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Siguiente / bloqueada por credenciales |
+| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | En curso: núcleo implementado, activación bloqueada por credenciales |
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
@@ -143,7 +146,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 instalado e inactivo.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
 - Tema GlowUp 0.2.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
-- Plugin `glowup-turnos` 0.3.0 activo con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
+- Plugin `glowup-turnos` 0.4.0 activo con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
 - Motor de agenda de la Fase 2: disponibilidad por servicio, profesional y fecha; pausas, excepciones y anticipación mínima/máxima.
 - Retención de horarios durante 15 minutos con lock por profesional, transacción, idempotencia y prevención de solapamientos.
 - API REST de disponibilidad, creación de retenciones y consulta de turnos de la clienta autenticada.
@@ -157,7 +160,13 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Wizard público en `/turnos/`: registro e ingreso inline, selección de servicio, profesional, fecha y horario, resumen, consentimientos y creación de la orden.
 - Creación de la orden de WooCommerce desde el plugin: `POST /glowup/v1/orders`, asociación por `order_id`, metadatos del turno y reutilización idempotente ante doble envío.
 - La retención vence a los 15 minutos y el wizard muestra el contador. Si el horario se ocupa o la retención vence, el flujo ofrece elegir otro horario sin perder el estado.
-- La pantalla de pago de una orden de reserva queda exceptuada de la pausa de la tienda. Mientras no exista cobro, muestra un aviso, oculta el botón de pago y ofrece volver a Mi cuenta.
+- La pantalla de pago de una orden de reserva queda exceptuada de la pausa de la tienda. Sin pasarela configurada muestra un aviso, oculta el botón de pago y ofrece volver a Mi cuenta; con una pasarela disponible muestra el pago real y el tiempo restante de la retención.
+- Fase 4 (núcleo): guarda server-side que bloquea el pago cuando la retención venció o el turno ya no está pendiente, y que impide reconfirmar turnos cancelados, completados o ausentes.
+- Fase 4 (núcleo): pago acreditado (`processing`/`completed`) confirma el turno y limpia la retención; cancelación o reembolso de la orden cancela el turno.
+- Fase 4 (núcleo): la conciliación de holds vencidos marca el turno como `expired` y cancela las órdenes de reserva `pending`/`failed` asociadas.
+- Fase 4 (núcleo): un pago tardío confirma el turno si el horario sigue libre y es futuro; si ya está ocupado o el turno fue cancelado, deja la orden marcada para revisión manual y reembolso.
+- Fase 4 (tema): los textos de pago, el CTA del wizard, el aviso de `order-pay` y el botón de pago se adaptan a si hay una pasarela de Mercado Pago disponible.
+- Fase 4 verificada con 17 comprobaciones de WP-CLI y pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (con y sin pasarela simulada), sin errores de PHP.
 - Errores verificados: horario ocupado (409), retención vencida (409), sesión vencida (403) y doble envío de orden (reutilización idempotente).
 - Accesibilidad 100 y Best Practices 100 en Lighthouse; sin desbordes horizontales en la verificación responsive.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
@@ -167,11 +176,12 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ### Próximo paso
 
-- Fase 4: integrar Mercado Pago en sandbox, conectar el pago de la orden de reserva, mapear webhooks a estados del turno y conciliar órdenes pendientes con retenciones vencidas. Está bloqueada hasta contar con credenciales.
+- Fase 4: activar Mercado Pago en sandbox apenas existan credenciales, probar checkout, webhooks y reembolsos end-to-end, y validar la conciliación con pagos reales. El núcleo de confirmación, cancelación y holds vencidos ya está implementado.
 
 ### Pendientes funcionales
 
-- Cancelación y reprogramación desde la cuenta de la clienta. No formaron parte del alcance cerrado de la Fase 3 y deben resolverse antes del lanzamiento.
+- Cancelación y reprogramación desde la cuenta de la clienta. La cancelación y el reembolso ya se reflejan cuando se cancelan o reembolsan desde WooCommerce, pero falta la acción de la clienta. Deben resolverse antes del lanzamiento.
+- Activar Mercado Pago y cargar credenciales de sandbox para cerrar la Fase 4.
 - Emails transaccionales y recordatorios de la Fase 5.
 - Agenda operativa completa y edición de horarios de la Fase 6.
 
@@ -206,7 +216,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | --- | --- | --- |
 | Credenciales de Mercado Pago tardías | Bloquea pagos y confirmación automática | Probar en sandbox apenas estén; dejar webhook y estados preparados |
 | Medios de pago no instantáneos | El turno puede liberarse antes de acreditarse | Definir ventana según medio; evaluar extender retención o confirmar manualmente |
-| Orden pendiente con retención vencida | La clienta puede llegar a pagar un horario ya liberado | La Fase 4 debe conciliar la orden antes del pago y cancelar o reasignar si el hold venció |
+| Orden pendiente con retención vencida | La clienta puede llegar a pagar un horario ya liberado | La guarda bloquea el pago y la conciliación cancela la orden; si el pago llega igual, se confirma solo con horario libre o se marca para revisión manual |
 | Doble reserva por concurrencia | Mala experiencia y conflicto operativo | Bloqueo transaccional y revalidación antes de insertar |
 | Doble envío de orden | Órdenes duplicadas | Lock por turno e idempotencia; la orden existente se reutiliza |
 | Datos de salud | Riesgo legal y de privacidad | Consentimiento explícito, acceso restringido y retención definida |
@@ -221,14 +231,13 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ## 9. Próximos pasos
 
-1. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno y orden (Fase 4).
-2. Resolver la conciliación de órdenes pendientes cuando la retención vence, antes de habilitar el cobro (Fase 4).
-3. Definir e implementar cancelación y reprogramación desde la cuenta (antes del lanzamiento).
-4. Implementar emails transaccionales y recordatorios (Fase 5).
-5. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios (Fase 6).
-6. Reemplazar placeholders con fotos y cerrar textos legales.
-7. Ejecutar QA integral y preparar el despliegue a producción (Fase 7).
-8. Recién después del lanzamiento, abrir la tienda pública como Fase 8.
+1. Activar Mercado Pago en sandbox, conectar el pago de la orden, mapear webhooks a estados del turno y validar la conciliación end-to-end (Fase 4).
+2. Definir e implementar cancelación y reprogramación desde la cuenta (antes del lanzamiento).
+3. Implementar emails transaccionales y recordatorios (Fase 5).
+4. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios (Fase 6).
+5. Reemplazar placeholders con fotos y cerrar textos legales.
+6. Ejecutar QA integral y preparar el despliegue a producción (Fase 7).
+7. Recién después del lanzamiento, abrir la tienda pública como Fase 8.
 
 ---
 
@@ -241,3 +250,4 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2026-11-10 | Ajuste de negocio: ubicación en La Rioja capital, zona horaria `America/Argentina/La_Rioja` y depilación solo definitiva por zona más pack completo. Plugin 0.2.1. |
 | 2026-11-11 | Reorganización de fases: la tienda pública pasa a la Fase 8 (futura) y Post-MVP a la Fase 9. Durante el MVP, tienda, carrito y checkout de productos muestran “Próximamente”. WooCommerce sigue activo para cuentas y órdenes de reservas. |
 | 2026-11-12 | Cierre de Fase 3: wizard público, registro e ingreso, disponibilidad, retención, orden de WooCommerce asociada y resumen previo al pago. Plugin 0.3.0 y tema 0.2.0. La Fase 4 queda como siguiente paso, bloqueada por credenciales de Mercado Pago. |
+| 2026-11-13 | Fase 4 (núcleo): guarda de pago, confirmación al acreditarse, cancelación/reembolso, conciliación de holds vencidos y revisión manual de pagos tardíos. Plugin 0.4.0. El tema adapta la UI de pago según la pasarela disponible. Activación de Mercado Pago pendiente de credenciales. |

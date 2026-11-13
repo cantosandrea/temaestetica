@@ -2,7 +2,7 @@
 GLOWUP — FASES REORGANIZADAS
 ============================================================
 
-Actualizado: 12 de noviembre de 2026
+Actualizado: 13 de noviembre de 2026
 Criterio: lanzar primero el sitio de marca y las reservas con pago.
 La tienda online pasa a una fase futura y, durante el MVP, solo
 muestra un cartel de "Próximamente".
@@ -15,7 +15,7 @@ Fase 0   Descubrimiento                        Completada
 Fase 1   Base técnica                          Completada
 Fase 2   Motor de agenda                       Completada
 Fase 3   Wizard de reserva y cuenta            Completada
-Fase 4   Pagos                                 Siguiente / bloqueada por credenciales
+Fase 4   Pagos                                 En curso (núcleo implementado; activación bloqueada)
 Fase 5   Emails                                Pendiente
 Fase 6   Operación                             Pendiente
 Fase 7   QA y lanzamiento                      Pendiente
@@ -136,29 +136,41 @@ orden queda pendiente de pago; el cobro se habilita en la Fase 4.
 FASE 4 — PAGOS
 ------------------------------------------------------------
 
-Estado: siguiente; bloqueada por credenciales de Mercado Pago.
+Estado: en curso. El núcleo de pagos está implementado; la activación de
+Mercado Pago y las pruebas end-to-end siguen bloqueadas por credenciales.
 
 Objetivo:
 Cobrar el total del turno al reservar y confirmar la reserva cuando
 el pago se acredite.
 
-Alcance:
-- Integración de Mercado Pago en sandbox.
-- Checkout de WooCommerce conectado a la orden de reserva.
-- Webhooks de pago, estados pendiente, aprobado, rechazado y
-  reembolsado.
-- Confirmación automática del turno al acreditarse el pago.
-- Liberación del horario si el pago no se completa.
-- Conciliación de órdenes pendientes cuyos holds vencieron.
-- Reembolsos por cancelación dentro del plazo de 24 horas.
-- Conciliación entre orden, pago y turno.
-- Pruebas de pago aprobado, rechazado, expirado y reembolsado.
+Alcance implementado:
+- Guarda server-side que bloquea el pago si la retención venció o el
+  turno ya no está pendiente.
+- Confirmación automática del turno cuando la orden pasa a un estado
+  pagado (`processing` o `completed`).
+- Cancelación del turno cuando la orden se cancela o se reembolsa.
+- Conciliación de holds vencidos: el turno pasa a `expired` y la orden
+  `pending`/`failed` asociada se cancela.
+- Pago tardío: se confirma si el horario sigue libre y el turno es
+  futuro; si no, la orden queda marcada para revisión manual y reembolso.
+- Los turnos `cancelled`, `completed` y `no_show` no se resucitan solos.
+- UI del tema condicionada a la disponibilidad de una pasarela: textos,
+  CTA del wizard, aviso y botón de `order-pay`.
+- Redirección clara cuando la retención venció antes de pagar.
+
+Alcance pendiente (bloqueado por credenciales):
+- Activar Mercado Pago en sandbox y cargar credenciales.
+- Probar checkout, webhooks, pago aprobado/rechazado/expirado y
+  reembolsos end-to-end.
+- Validar la conciliación con pagos reales de la pasarela.
+- Reembolsos por cancelación dentro del plazo de 24 horas desde la cuenta.
 
 Dependencias:
 Fase 3 cerrada y credenciales de Mercado Pago disponibles.
 
 Criterio de cierre:
-Un turno pagado queda confirmado y uno no pagado libera el horario.
+Un turno pagado queda confirmado y uno no pagado libera el horario, con
+checkout, webhooks y reembolsos probados en sandbox.
 
 ------------------------------------------------------------
 FASE 5 — EMAILS
@@ -263,7 +275,8 @@ Durante el MVP:
 - WooCommerce sigue activo para cuentas y órdenes de reservas; lo que
   se pausa es la tienda pública, no el motor de cuentas.
 - La pausa aplica a la compra de productos. La pantalla de pago de una
-  reserva ya se exceptúa de la pausa; el cobro se habilita en la Fase 4.
+  reserva está exceptuada de la pausa; el cobro se habilita cuando
+  Mercado Pago tenga credenciales.
 
 Alcance futuro:
 - Catálogo público con categorías y fichas de producto.
@@ -317,8 +330,8 @@ el flujo de turnos con pago; después se abre la tienda.
 
 Esta pausa es solo para la compra de productos. WooCommerce sigue
 siendo la infraestructura de cuentas y órdenes de reservas; el
-checkout de una reserva se habilita en la Fase 4 y no debe
-confundirse con la tienda.
+checkout de una reserva se habilita cuando Mercado Pago esté
+configurado y no debe confundirse con la tienda.
 
 Mientras la tienda esté en pausa:
 - No prometer compras online desde la home ni desde el menú.
@@ -332,13 +345,17 @@ ESTADO ACTUAL
 
 Completado:
 - Fases 0, 1, 2 y 3.
+- Fase 4 (núcleo): guarda de pago, confirmación, cancelación/reembolso,
+  conciliación de holds vencidos y revisión manual de pagos tardíos.
 - WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
-- Tema GlowUp 0.2.0 y plugin `glowup-turnos` 0.3.0, esquema 1.1.0.
+- Tema GlowUp 0.2.0 y plugin `glowup-turnos` 0.4.0, esquema 1.1.0.
 - 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
 - 18 productos cargados como catálogo interno.
 - API de disponibilidad, holds, órdenes y turnos.
 - Agenda de bloqueos en el panel.
 - Wizard público de reserva con cuenta, retención y orden pendiente.
+- UI de pago condicionada a la disponibilidad de una pasarela; sin
+  credenciales no se ofrece cobro.
 - Tienda pública pausada: `/tienda/`, fichas de producto, carrito y
   checkout de productos muestran "Muy pronto". Home y encabezado
   adaptados a la pausa.
@@ -351,14 +368,15 @@ Nota sobre la tienda:
   tienda pública completa es la Fase 8.
 
 Siguiente:
-- Fase 4: Mercado Pago, webhooks y conciliación de órdenes pendientes.
+- Fase 4: activar Mercado Pago en sandbox, cargar credenciales y probar
+  checkout, webhooks y reembolsos end-to-end.
 
 Pendiente funcional:
 - Cancelación y reprogramación desde la cuenta de la clienta.
 - Emails transaccionales y recordatorios.
 
 Bloqueado:
-- Fase 4: credenciales de Mercado Pago.
+- Fase 4: activación de Mercado Pago y pruebas con credenciales.
 
 Pendiente de terceros:
 - Fotos y logo definitivos.
@@ -370,8 +388,9 @@ Pendiente de terceros:
 PRÓXIMOS PASOS
 ------------------------------------------------------------
 
-1. Integrar Mercado Pago en sandbox cuando estén las credenciales.
-2. Conciliar órdenes pendientes con holds vencidos antes de habilitar el cobro.
+1. Activar Mercado Pago en sandbox cuando estén las credenciales y probar
+   checkout, webhooks y reembolsos end-to-end.
+2. Validar la conciliación de holds vencidos y pagos tardíos con la pasarela real.
 3. Definir e implementar cancelación y reprogramación desde la cuenta.
 4. Implementar emails transaccionales.
 5. Completar la agenda operativa del panel.

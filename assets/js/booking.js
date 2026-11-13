@@ -793,7 +793,9 @@
 		]);
 
 		if (els.orderView) {
-			els.orderView.href = data.view_url || config.accountUrl;
+			const detailUrl = data.view_url || config.accountUrl;
+
+			els.orderView.href = config.paymentsEnabled && data.pay_url ? data.pay_url : detailUrl;
 		}
 	}
 

@@ -19,6 +19,18 @@ function glowup_booking_is_available() {
 }
 
 /**
+ * Whether online payment for bookings is enabled.
+ *
+ * Phase 4 starts with payments off. The booking plugin can enable them
+ * through this filter once Mercado Pago is configured.
+ *
+ * @return bool
+ */
+function glowup_booking_payments_enabled() {
+	return (bool) apply_filters( 'glowup_booking_payments_enabled', false );
+}
+
+/**
  * Whether a user can create bookings.
  *
  * @param int $user_id Optional user ID.

@@ -55,6 +55,7 @@
 		orderHoldNote: root.querySelector('[data-order-hold-note]'),
 		orderSummary: root.querySelector('[data-order-summary]'),
 		orderView: root.querySelector('[data-order-view]'),
+		orderPay: root.querySelector('[data-order-pay]'),
 		summaryService: root.querySelector('[data-summary-service]'),
 		summaryProfessional: root.querySelector('[data-summary-professional]'),
 		summaryWhen: root.querySelector('[data-summary-when]'),
@@ -777,9 +778,23 @@
 
 		if (els.orderHoldNote) {
 			if (Number(data.hold_expires_in) > 0) {
-				els.orderHoldNote.textContent = 'El horario queda retenido por ' + Math.ceil(Number(data.hold_expires_in) / 60) + ' minutos. Si no se completa el pago, se libera automáticamente.';
+				var minutes = Math.ceil(Number(data.hold_expires_in) / 60);
+
+				els.orderHoldNote.textContent = config.paymentAvailable
+					? 'El horario queda retenido por ' + minutes + ' minutos. Si no se acredita el pago, se libera automáticamente.'
+					: 'El horario queda retenido por ' + minutes + ' minutos. El pago online todavía no está habilitado, así que no se realiza ningún cobro.';
 			} else {
 				els.orderHoldNote.textContent = 'La retención del horario ya venció.';
+			}
+		}
+
+		if (els.orderPay) {
+			if (config.paymentAvailable && data.payment_url) {
+				els.orderPay.href = data.payment_url;
+				els.orderPay.hidden = false;
+			} else {
+				els.orderPay.hidden = true;
+				els.orderPay.removeAttribute('href');
 			}
 		}
 

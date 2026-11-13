@@ -307,3 +307,67 @@ function glowup_booking_order_from_pay_request() {
 
 	return 'yes' === $order->get_meta( '_glowup_booking_order' ) ? $order : null;
 }
+
+/**
+ * Whether a Mercado Pago gateway is configured and available.
+ *
+ * WooCommerce's available gateways already apply the gateway's own checks,
+ * including the Mercado Pago credential check. The wizard only promises online
+ * payment when that chain says the gateway can actually charge.
+ *
+ * @return bool
+ */
+function glowup_booking_payments_available() {
+	static $available = null;
+
+	if ( null !== $available ) {
+		return $available;
+	}
+
+	$available = false;
+
+	if ( function_exists( 'WC' ) && WC()->payment_gateways() ) {
+		foreach ( array_keys( WC()->payment_gateways()->get_available_payment_gateways() ) as $gateway_id ) {
+			if ( 0 === strpos( $gateway_id, 'woo-mercado-pago' ) ) {
+				$available = true;
+				break;
+			}
+		}
+	}
+
+	$available = (bool) apply_filters( 'glowup_booking_payments_available', $available );
+
+	return $available;
+}
+
+/**
+ * Get the appointment linked to a booking order.
+ *
+ * @param \WC_Order|mixed $order Order object.
+ * @return array|null
+ */
+function glowup_booking_order_appointment( $order ) {
+	if ( ! $order instanceof WC_Order ) {
+		return null;
+	}
+
+	if ( ! class_exists( 'GlowUp\\Turnos\\Booking_Orders' ) || ! method_exists( 'GlowUp\\Turnos\\Booking_Orders', 'get_appointment_for_order' ) ) {
+		return null;
+	}
+
+	return GlowUp\Turnos\Booking_Orders::get_appointment_for_order( $order );
+}
+
+/**
+ * Whether a booking order still has a payable hold.
+ *
+ * @param \WC_Order $order Order object.
+ * @return bool
+ */
+function glowup_booking_order_hold_is_active( $order ) {
+	$appointment = glowup_booking_order_appointment( $order );
+
+	return $appointment
+		&& 'pending' === $appointment['status']
+		&& ! empty( $appointment['is_hold_active'] );
+}

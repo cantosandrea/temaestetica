@@ -114,6 +114,7 @@ function glowup_enqueue_booking_assets() {
 			'currency'       => function_exists( 'get_woocommerce_currency_symbol' ) ? html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ) : '$',
 			'holdMinutes'    => $hold_minutes,
 			'maxAdvanceDays' => $max_advance_days,
+			'paymentAvailable' => glowup_booking_payments_available(),
 			'paymentMode'    => $payment_mode,
 			'depositPercent' => $deposit_percent,
 			'timezone'       => $timezone,

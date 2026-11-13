@@ -82,9 +82,66 @@ function glowup_booking_pay_order_notice() {
 		return;
 	}
 
-	echo '<div class="woocommerce-info glow-booking-pay-notice">' . esc_html__( 'Este pedido corresponde a un turno. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' ) . '</div>';
+	if ( ! glowup_booking_payments_available() ) {
+		echo '<div class="woocommerce-info glow-booking-pay-notice">' . esc_html__( 'Este pedido corresponde a un turno. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' ) . '</div>';
+		return;
+	}
+
+	if ( ! glowup_booking_order_hold_is_active( $order ) ) {
+		echo '<div class="woocommerce-error glow-booking-pay-notice">';
+		echo esc_html__( 'La retención de este horario ya venció y el pedido no se puede pagar.', 'temaestetica' );
+		echo ' <a href="' . esc_url( glowup_booking_url() ) . '">' . esc_html__( 'Elegir otro horario', 'temaestetica' ) . '</a>';
+		echo '</div>';
+		return;
+	}
+
+	$appointment = glowup_booking_order_appointment( $order );
+	$seconds     = class_exists( 'GlowUp\\Turnos\\Time' ) && ! empty( $appointment['hold_expires_at'] )
+		? GlowUp\Turnos\Time::seconds_until( $appointment['hold_expires_at'] )
+		: 0;
+	$minutes     = max( 1, (int) ceil( $seconds / 60 ) );
+
+	echo '<div class="woocommerce-info glow-booking-pay-notice">' . esc_html(
+		sprintf(
+			/* translators: %d: minutes remaining in the hold. */
+			_n(
+				'Tenés %d minuto para completar el pago. Si la retención vence, el horario se libera automáticamente.',
+				'Tenés %d minutos para completar el pago. Si la retención vence, el horario se libera automáticamente.',
+				$minutes,
+				'temaestetica'
+			),
+			$minutes
+		)
+	) . '</div>';
 }
 add_action( 'woocommerce_pay_order_before_payment', 'glowup_booking_pay_order_notice' );
+
+/**
+ * Keep an expired booking from reaching WooCommerce's payment form.
+ *
+ * The plugin also blocks payment server-side; this redirect exists so the
+ * customer sees a clear message instead of WooCommerce's generic
+ * "cannot be paid" error.
+ */
+function glowup_booking_guard_pay_request() {
+	$order = glowup_booking_order_from_pay_request();
+
+	if ( ! $order ) {
+		return;
+	}
+
+	if ( ! isset( $_GET['key'] ) || ! in_array( $order->get_status(), array( 'pending', 'failed' ), true ) ) {
+		return;
+	}
+
+	if ( glowup_booking_order_hold_is_active( $order ) ) {
+		return;
+	}
+
+	wp_safe_redirect( add_query_arg( 'glowup_pay', 'expired', glowup_booking_url() ) );
+	exit;
+}
+add_action( 'before_woocommerce_pay', 'glowup_booking_guard_pay_request' );
 
 /**
  * Replace WooCommerce's generic "no payment methods" message for bookings.
@@ -93,16 +150,22 @@ add_action( 'woocommerce_pay_order_before_payment', 'glowup_booking_pay_order_no
  * @return string
  */
 function glowup_booking_no_payment_methods_message( $message ) {
-	if ( glowup_booking_order_from_pay_request() ) {
+	$order = glowup_booking_order_from_pay_request();
+
+	if ( ! $order ) {
+		return $message;
+	}
+
+	if ( ! glowup_booking_payments_available() ) {
 		return __( 'El pago online estará disponible próximamente. Tu pedido queda pendiente y el horario se libera cuando vence la retención.', 'temaestetica' );
 	}
 
-	return $message;
+	return __( 'No hay medios de pago disponibles para este pedido. Volvé a intentarlo en unos minutos o escribinos.', 'temaestetica' );
 }
 add_filter( 'woocommerce_no_available_payment_methods_message', 'glowup_booking_no_payment_methods_message' );
 
 /**
- * Replace the pay button with an account link until payments are enabled.
+ * Replace the pay button only when the booking cannot be paid online.
  *
  * @param string $html Button HTML.
  * @return string
@@ -112,6 +175,14 @@ function glowup_booking_pay_order_button_html( $html ) {
 
 	if ( ! $order ) {
 		return $html;
+	}
+
+	if ( glowup_booking_payments_available() ) {
+		if ( glowup_booking_order_hold_is_active( $order ) ) {
+			return $html;
+		}
+
+		return '<a class="button alt" href="' . esc_url( glowup_booking_url() ) . '">' . esc_html__( 'Elegir otro horario', 'temaestetica' ) . '</a>';
 	}
 
 	return '<a class="button alt" href="' . esc_url( glowup_account_url() ) . '">' . esc_html__( 'Volver a mi cuenta', 'temaestetica' ) . '</a>';

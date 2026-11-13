@@ -12,6 +12,7 @@ $glowup_steps        = glowup_get_process_steps();
 $glowup_is_logged_in = is_user_logged_in();
 $glowup_can_book     = glowup_booking_can_book();
 $glowup_available    = glowup_booking_is_available();
+$glowup_payment_available = glowup_booking_payments_available();
 $glowup_current_user = $glowup_is_logged_in ? wp_get_current_user() : null;
 $glowup_privacy_url  = get_privacy_policy_url() ? get_privacy_policy_url() : glowup_booking_legal_url( 'politica-de-privacidad' );
 $glowup_terms_url    = glowup_booking_legal_url( 'terminos-y-condiciones' );
@@ -56,7 +57,13 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 						<a class="btn" href="#cuenta"><?php esc_html_e( 'Crear cuenta o ingresar', 'temaestetica' ); ?></a>
 						<a class="btn btn--ghost" href="<?php echo esc_url( home_url( '/servicios/' ) ); ?>"><?php esc_html_e( 'Ver servicios', 'temaestetica' ); ?></a>
 					</div>
-					<p class="page-hero__meta"><?php esc_html_e( 'El pago online se habilita en la próxima etapa. No se realizan cobros todavía.', 'temaestetica' ); ?></p>
+					<p class="page-hero__meta">
+						<?php if ( $glowup_payment_available ) : ?>
+							<?php esc_html_e( 'El pago online se realiza con Mercado Pago al confirmar la reserva.', 'temaestetica' ); ?>
+						<?php else : ?>
+							<?php esc_html_e( 'El pago online se habilita en la próxima etapa. No se realizan cobros todavía.', 'temaestetica' ); ?>
+						<?php endif; ?>
+					</p>
 				<?php endif; ?>
 			</div>
 			<div class="page-hero__image">
@@ -68,6 +75,12 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 	<section class="section booking-section" id="reservar">
 		<div class="container">
 			<?php glowup_booking_auth_notice(); ?>
+
+			<?php if ( isset( $_GET['glowup_pay'] ) && 'expired' === sanitize_key( wp_unslash( $_GET['glowup_pay'] ) ) ) : ?>
+				<div class="booking-alert booking-alert--error" role="alert">
+					<p><?php esc_html_e( 'La retención de ese horario venció y el pedido ya no se puede pagar. Elegí un nuevo horario para reservar.', 'temaestetica' ); ?></p>
+				</div>
+			<?php endif; ?>
 
 			<?php if ( ! $glowup_available ) : ?>
 				<div class="booking-notice">
@@ -103,13 +116,23 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 								<div>
 									<strong><?php esc_html_e( 'Confirmá', 'temaestetica' ); ?></strong>
 									<p>
-										<?php
-										printf(
-											/* translators: %d: hold duration in minutes. */
-											esc_html__( 'Retenemos el lugar por %d minutos y creamos tu pedido. El pago online se habilita en la próxima etapa.', 'temaestetica' ),
-											(int) $glowup_hold_minutes
-										);
-										?>
+										<?php if ( $glowup_payment_available ) : ?>
+											<?php
+											printf(
+												/* translators: %d: hold duration in minutes. */
+												esc_html__( 'Retenemos el lugar por %d minutos y creamos tu pedido para que pagues online.', 'temaestetica' ),
+												(int) $glowup_hold_minutes
+											);
+											?>
+										<?php else : ?>
+											<?php
+											printf(
+												/* translators: %d: hold duration in minutes. */
+												esc_html__( 'Retenemos el lugar por %d minutos y creamos tu pedido. El pago online se habilita en la próxima etapa.', 'temaestetica' ),
+												(int) $glowup_hold_minutes
+											);
+											?>
+										<?php endif; ?>
 									</p>
 								</div>
 							</li>
@@ -328,7 +351,7 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 								</label>
 							</div>
 
-							<p class="review-note"><?php esc_html_e( 'No se realiza ningún cobro en este paso.', 'temaestetica' ); ?></p>
+							<p class="review-note"><?php echo $glowup_payment_available ? esc_html__( 'El cobro se realiza al finalizar, con Mercado Pago.', 'temaestetica' ) : esc_html__( 'No se realiza ningún cobro en este paso.', 'temaestetica' ); ?></p>
 
 							<div class="wizard-actions">
 								<button class="btn btn--ghost" type="button" data-back="3"><?php esc_html_e( 'Volver', 'temaestetica' ); ?></button>
@@ -340,7 +363,13 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 							<header class="wizard-panel__head">
 								<p class="kicker"><?php esc_html_e( 'Horario retenido', 'temaestetica' ); ?></p>
 								<h2 id="wizard-step-5" tabindex="-1"><?php esc_html_e( 'Guardamos tu lugar.', 'temaestetica' ); ?></h2>
-								<p><?php esc_html_e( 'Tenés unos minutos para confirmar la reserva. Después, el horario vuelve a quedar libre.', 'temaestetica' ); ?></p>
+								<p>
+									<?php if ( $glowup_payment_available ) : ?>
+										<?php esc_html_e( 'Tenés unos minutos para completar el pago. Si no se acredita, el horario vuelve a quedar libre.', 'temaestetica' ); ?>
+									<?php else : ?>
+										<?php esc_html_e( 'Tenés unos minutos para confirmar la reserva. Después, el horario vuelve a quedar libre.', 'temaestetica' ); ?>
+									<?php endif; ?>
+								</p>
 							</header>
 
 							<div class="hold-timer" data-hold-timer>
@@ -352,14 +381,19 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 
 							<div class="wizard-actions">
 								<button class="btn btn--ghost" type="button" data-restart><?php esc_html_e( 'Elegir otro horario', 'temaestetica' ); ?></button>
-								<button class="btn" type="button" data-create-order><?php esc_html_e( 'Confirmar reserva', 'temaestetica' ); ?></button>
+								<button class="btn" type="button" data-create-order><?php echo $glowup_payment_available ? esc_html__( 'Continuar al pago', 'temaestetica' ) : esc_html__( 'Confirmar reserva', 'temaestetica' ); ?></button>
 							</div>
 						</section>
 
 						<section class="wizard-panel wizard-panel--success" data-step-panel="6" aria-labelledby="wizard-step-6" hidden>
 							<p class="kicker"><?php esc_html_e( 'Pedido creado', 'temaestetica' ); ?></p>
-							<h2 id="wizard-step-6" tabindex="-1"><?php esc_html_e( 'Tu reserva quedó registrada.', 'temaestetica' ); ?></h2>
-							<p><?php esc_html_e( 'Guardamos el horario y creamos el pedido. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' ); ?></p>
+							<?php if ( $glowup_payment_available ) : ?>
+								<h2 id="wizard-step-6" tabindex="-1"><?php esc_html_e( 'Tu reserva está casi lista.', 'temaestetica' ); ?></h2>
+								<p><?php esc_html_e( 'Guardamos el horario y creamos el pedido. Completá el pago online para confirmar tu turno.', 'temaestetica' ); ?></p>
+							<?php else : ?>
+								<h2 id="wizard-step-6" tabindex="-1"><?php esc_html_e( 'Tu reserva quedó registrada.', 'temaestetica' ); ?></h2>
+								<p><?php esc_html_e( 'Guardamos el horario y creamos el pedido. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' ); ?></p>
+							<?php endif; ?>
 
 							<div class="booking-alert booking-alert--info">
 								<p>
@@ -378,7 +412,8 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 							<dl class="summary-list summary-list--paper" data-order-summary></dl>
 
 							<div class="wizard-actions">
-								<a class="btn" href="#" data-order-view><?php esc_html_e( 'Ver mi pedido', 'temaestetica' ); ?></a>
+								<a class="btn" href="#" data-order-pay hidden><?php esc_html_e( 'Pagar ahora', 'temaestetica' ); ?></a>
+								<a class="btn<?php echo $glowup_payment_available ? ' btn--ghost' : ''; ?>" href="#" data-order-view><?php esc_html_e( 'Ver mi pedido', 'temaestetica' ); ?></a>
 								<a class="btn btn--ghost" href="<?php echo esc_url( glowup_account_url() ); ?>"><?php esc_html_e( 'Ir a mi cuenta', 'temaestetica' ); ?></a>
 							</div>
 						</section>
@@ -454,7 +489,7 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 				</article>
 				<article class="policy-card policy-card--accent">
 					<h3><?php esc_html_e( 'Pago', 'temaestetica' ); ?></h3>
-					<p><?php esc_html_e( 'El pago online se habilita en la próxima etapa. Mientras tanto, la reserva queda pendiente de pago y no se realizan cobros.', 'temaestetica' ); ?></p>
+					<p><?php echo esc_html( $glowup_policies['payment'] ); ?></p>
 				</article>
 			</div>
 		</div>

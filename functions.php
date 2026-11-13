@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GLOWUP_VERSION', '0.1.0' );
+define( 'GLOWUP_VERSION', '0.2.0' );
 define( 'GLOWUP_DIR', get_template_directory() );
 define( 'GLOWUP_URI', get_template_directory_uri() );
 
@@ -18,6 +18,7 @@ require_once GLOWUP_DIR . '/inc/assets.php';
 require_once GLOWUP_DIR . '/inc/template-tags.php';
 require_once GLOWUP_DIR . '/inc/content.php';
 require_once GLOWUP_DIR . '/inc/customizer.php';
+require_once GLOWUP_DIR . '/inc/booking.php';
 require_once GLOWUP_DIR . '/inc/woocommerce.php';
 
 add_action( 'after_setup_theme', 'glowup_setup' );

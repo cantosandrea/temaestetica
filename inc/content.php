@@ -168,8 +168,8 @@ function glowup_get_process_steps() {
 		),
 		array(
 			'number' => '02',
-			'title'  => 'Reservá y pagá',
-			'text'   => 'Elegí día y horario, pagá online y guardá tu confirmación.',
+			'title'  => 'Reservá y confirmá',
+			'text'   => 'Elegí día y horario, guardá tu lugar y completá el pago cuando esté disponible.',
 		),
 		array(
 			'number' => '03',

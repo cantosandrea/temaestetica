@@ -31,6 +31,12 @@ if ( ! class_exists( 'WooCommerce' ) ) {
  * @return bool
  */
 function glowup_store_is_public_page() {
+	// A booking order-pay screen is part of the booking flow, not the
+	// product storefront. Keep it reachable while the catalog stays paused.
+	if ( function_exists( 'glowup_booking_order_from_pay_request' ) && glowup_booking_order_from_pay_request() ) {
+		return false;
+	}
+
 	return is_shop()
 		|| is_product()
 		|| is_product_taxonomy()
@@ -65,6 +71,69 @@ function glowup_store_coming_soon_template( $template ) {
 	return $coming_soon ? $coming_soon : $template;
 }
 add_filter( 'template_include', 'glowup_store_coming_soon_template', 99 );
+
+/**
+ * Explain the payment state on a booking order-pay screen.
+ */
+function glowup_booking_pay_order_notice() {
+	$order = glowup_booking_order_from_pay_request();
+
+	if ( ! $order ) {
+		return;
+	}
+
+	echo '<div class="woocommerce-info glow-booking-pay-notice">' . esc_html__( 'Este pedido corresponde a un turno. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' ) . '</div>';
+}
+add_action( 'woocommerce_pay_order_before_payment', 'glowup_booking_pay_order_notice' );
+
+/**
+ * Replace WooCommerce's generic "no payment methods" message for bookings.
+ *
+ * @param string $message Original message.
+ * @return string
+ */
+function glowup_booking_no_payment_methods_message( $message ) {
+	if ( glowup_booking_order_from_pay_request() ) {
+		return __( 'El pago online estará disponible próximamente. Tu pedido queda pendiente y el horario se libera cuando vence la retención.', 'temaestetica' );
+	}
+
+	return $message;
+}
+add_filter( 'woocommerce_no_available_payment_methods_message', 'glowup_booking_no_payment_methods_message' );
+
+/**
+ * Replace the pay button with an account link until payments are enabled.
+ *
+ * @param string $html Button HTML.
+ * @return string
+ */
+function glowup_booking_pay_order_button_html( $html ) {
+	$order = glowup_booking_order_from_pay_request();
+
+	if ( ! $order ) {
+		return $html;
+	}
+
+	return '<a class="button alt" href="' . esc_url( glowup_account_url() ) . '">' . esc_html__( 'Volver a mi cuenta', 'temaestetica' ) . '</a>';
+}
+add_filter( 'woocommerce_pay_order_button_html', 'glowup_booking_pay_order_button_html' );
+
+/**
+ * Hide the checkout terms checkbox on booking order-pay screens.
+ *
+ * The booking wizard already collects its own consents.
+ *
+ * @param string $text Checkbox text.
+ * @return string
+ */
+function glowup_booking_pay_order_terms_text( $text ) {
+	if ( glowup_booking_order_from_pay_request() ) {
+		return '';
+	}
+
+	return $text;
+}
+add_filter( 'woocommerce_get_terms_and_conditions_checkbox_text', 'glowup_booking_pay_order_terms_text' );
 
 remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
 remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );

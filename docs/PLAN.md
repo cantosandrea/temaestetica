@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.4.0
+**Versión:** 0.5.0
 **Actualizado:** 12 de noviembre de 2026
-**Estado:** Fase 3 completada. La Fase 4 (pagos) es el siguiente paso, bloqueada por credenciales de Mercado Pago. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Estado:** Fase 3 completada. La Fase 4 (pagos) está iniciada con la preparación en el tema y el cobro desactivado por defecto; la integración real sigue bloqueada por credenciales de Mercado Pago. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -16,7 +16,7 @@ GlowUp es un salón de estética integral en La Rioja capital. El proyecto const
 
 La implementación se apoya en WordPress y WooCommerce para cuentas, pedidos y pagos. La lógica de agenda vive en un plugin propio, `glowup-turnos`, para no mezclar reglas de negocio con la presentación. El tema `temaestetica` conserva el slug técnico y muestra la marca **GlowUp**.
 
-El trabajo se desarrolla por fases. La Fase 3 ya está cerrada: `/turnos/` permite crear una cuenta o iniciar sesión, elegir servicio, profesional, fecha y horario, retener el lugar por 15 minutos y generar una orden de WooCommerce asociada al turno. **Todavía no se cobra**: la orden queda pendiente de pago y el checkout online se habilita en la Fase 4. La tienda pública de productos sigue pausada: `/tienda/`, las fichas de producto, el carrito y el checkout de productos muestran “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
+El trabajo se desarrolla por fases. La Fase 3 ya está cerrada: `/turnos/` permite crear una cuenta o iniciar sesión, elegir servicio, profesional, fecha y horario, retener el lugar por 15 minutos y generar una orden de WooCommerce asociada al turno. **La Fase 4 ya comenzó con la preparación del tema**: el interruptor `glowup_booking_payments_enabled()` queda apagado por defecto, de modo que la orden sigue pendiente y no se cobra nada hasta que la pasarela esté operativa. La integración real de Mercado Pago, los webhooks y la conciliación siguen bloqueados por credenciales. La tienda pública de productos sigue pausada: `/tienda/`, las fichas de producto, el carrito y el checkout de productos muestran “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
 
 ---
 
@@ -125,7 +125,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 1. Base técnica | Entorno local, backup, WooCommerce, tema, plugin base, contenido y tienda inicial | Completada |
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
 | 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
-| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Siguiente / bloqueada por credenciales |
+| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Iniciada / preparación; cobro bloqueado por credenciales |
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
@@ -142,7 +142,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Backup de la base anterior en `C:\xampp\backups\esteticaweb\estetica_bd-20261108-230343.sql`.
 - WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 instalado e inactivo.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
-- Tema GlowUp 0.2.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
+- Tema GlowUp 0.3.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
 - Plugin `glowup-turnos` 0.3.0 activo con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
 - Motor de agenda de la Fase 2: disponibilidad por servicio, profesional y fecha; pausas, excepciones y anticipación mínima/máxima.
 - Retención de horarios durante 15 minutos con lock por profesional, transacción, idempotencia y prevención de solapamientos.
@@ -157,7 +157,8 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Wizard público en `/turnos/`: registro e ingreso inline, selección de servicio, profesional, fecha y horario, resumen, consentimientos y creación de la orden.
 - Creación de la orden de WooCommerce desde el plugin: `POST /glowup/v1/orders`, asociación por `order_id`, metadatos del turno y reutilización idempotente ante doble envío.
 - La retención vence a los 15 minutos y el wizard muestra el contador. Si el horario se ocupa o la retención vence, el flujo ofrece elegir otro horario sin perder el estado.
-- La pantalla de pago de una orden de reserva queda exceptuada de la pausa de la tienda. Mientras no exista cobro, muestra un aviso, oculta el botón de pago y ofrece volver a Mi cuenta.
+- La pantalla de pago de una orden de reserva queda exceptuada de la pausa de la tienda. Con los pagos desactivados (por defecto), muestra un aviso, oculta el botón de pago y ofrece volver a Mi cuenta.
+- Fase 4 iniciada en el tema: `glowup_booking_payments_enabled()` apagado por defecto y filtrable, avisos y botón de pago del `order-pay` condicionados al interruptor, y copia del wizard adaptada al estado de pagos.
 - Errores verificados: horario ocupado (409), retención vencida (409), sesión vencida (403) y doble envío de orden (reutilización idempotente).
 - Accesibilidad 100 y Best Practices 100 en Lighthouse; sin desbordes horizontales en la verificación responsive.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
@@ -167,7 +168,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ### Próximo paso
 
-- Fase 4: integrar Mercado Pago en sandbox, conectar el pago de la orden de reserva, mapear webhooks a estados del turno y conciliar órdenes pendientes con retenciones vencidas. Está bloqueada hasta contar con credenciales.
+- Fase 4: integrar Mercado Pago en sandbox, conectar el pago de la orden de reserva, mapear webhooks a estados del turno y conciliar órdenes pendientes con retenciones vencidas. El tema ya expone el interruptor de pagos; la integración real y la habilitación del cobro quedan bloqueadas hasta contar con credenciales.
 
 ### Pendientes funcionales
 
@@ -221,7 +222,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ## 9. Próximos pasos
 
-1. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno y orden (Fase 4).
+1. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno y orden (Fase 4). Recién entonces habilitar `glowup_booking_payments_enabled()`.
 2. Resolver la conciliación de órdenes pendientes cuando la retención vence, antes de habilitar el cobro (Fase 4).
 3. Definir e implementar cancelación y reprogramación desde la cuenta (antes del lanzamiento).
 4. Implementar emails transaccionales y recordatorios (Fase 5).
@@ -241,3 +242,4 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2026-11-10 | Ajuste de negocio: ubicación en La Rioja capital, zona horaria `America/Argentina/La_Rioja` y depilación solo definitiva por zona más pack completo. Plugin 0.2.1. |
 | 2026-11-11 | Reorganización de fases: la tienda pública pasa a la Fase 8 (futura) y Post-MVP a la Fase 9. Durante el MVP, tienda, carrito y checkout de productos muestran “Próximamente”. WooCommerce sigue activo para cuentas y órdenes de reservas. |
 | 2026-11-12 | Cierre de Fase 3: wizard público, registro e ingreso, disponibilidad, retención, orden de WooCommerce asociada y resumen previo al pago. Plugin 0.3.0 y tema 0.2.0. La Fase 4 queda como siguiente paso, bloqueada por credenciales de Mercado Pago. |
+| 2026-11-12 | Inicio de Fase 4 en el tema: `glowup_booking_payments_enabled()` apagado por defecto, avisos y botón del `order-pay` condicionados y copia del wizard según el estado de pagos. Tema 0.3.0. La integración real de Mercado Pago sigue bloqueada por credenciales. |

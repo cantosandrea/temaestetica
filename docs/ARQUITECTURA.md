@@ -1,6 +1,6 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.4.0
+**Versión:** 0.5.0
 **Actualizado:** 12 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
@@ -41,7 +41,7 @@ El sitio se apoya en tres capas:
 - **Negocio:** plugin `glowup-turnos`, dueño de la agenda, la disponibilidad, las políticas y la persistencia de turnos.
 - **Comercio:** WooCommerce para cuentas, órdenes, pagos y checkout de reservas; Mercado Pago como pasarela prevista. La tienda pública de productos está pausada durante el MVP y se abre en la Fase 8.
 
-La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper las cuentas ni los pedidos. El tema degrada a contenido de ejemplo si el plugin no está presente. La pausa de la tienda es solo de la vidriera pública de productos: las cuentas y los pedidos siguen operativos. La pantalla `order-pay` de una orden de reserva ya se exceptúa de la pausa; el cobro real se habilita en la Fase 4.
+La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper las cuentas ni los pedidos. El tema degrada a contenido de ejemplo si el plugin no está presente. La pausa de la tienda es solo de la vidriera pública de productos: las cuentas y los pedidos siguen operativos. La pantalla `order-pay` de una orden de reserva ya se exceptúa de la pausa; el cobro real se habilita cuando la Fase 4 active el interruptor de pagos.
 
 ---
 
@@ -55,13 +55,13 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | Servidor local | XAMPP en Windows |
 | WooCommerce | 11.3.0 |
 | Mercado Pago | Plugin oficial 8.10.0, inactivo |
-| Tema | `temaestetica` 0.2.0, marca GlowUp |
+| Tema | `temaestetica` 0.3.0, marca GlowUp |
 | Plugin de reservas | `glowup-turnos` 0.3.0, DB 1.1.0 |
 | Prefijo de tablas | `wp_` |
 | Moneda | ARS |
 | Zona horaria | America/Argentina/La_Rioja (La Rioja capital, UTC-3) |
 | Checkout de productos | Bloques de WooCommerce |
-| Checkout de reservas | `order-pay` clásico de WooCommerce, sin cobro en la Fase 3 |
+| Checkout de reservas | `order-pay` clásico de WooCommerce; cobro desactivado por defecto hasta habilitar la Fase 4 |
 | Wizard | JavaScript propio, sin bundler ni build |
 | Email | `wp_mail` y cron de WordPress |
 
@@ -152,8 +152,8 @@ La tienda pública es la Fase 8. Mientras el MVP no la abra, `inc/woocommerce.ph
 - Las cuentas con `manage_woocommerce` (administradoras y encargadas de tienda) siguen viendo la tienda real para gestionar productos y probar el checkout.
 - El encabezado oculta el icono del carrito a las visitantes y la sección de tienda de la home se reemplaza por un aviso de “Próximamente”.
 - `/mi-cuenta/` no se interviene: las cuentas siguen disponibles para reservar y consultar turnos.
-- La pantalla `order-pay` de una orden de reserva se excluye de `glowup_store_is_public_page()`. Mientras no exista cobro, muestra un aviso, reemplaza el botón de pago por un enlace a Mi cuenta y oculta el checkbox de términos que ya se aceptó en el wizard.
-- El cobro real de esa pantalla se habilita en la Fase 4; hasta entonces no se ofrece ningún medio de pago para reservas.
+- La pantalla `order-pay` de una orden de reserva se excluye de `glowup_store_is_public_page()`. Con los pagos desactivados (por defecto), muestra un aviso, reemplaza el botón de pago por un enlace a Mi cuenta y oculta el checkbox de términos que ya se aceptó en el wizard.
+- El cobro real de esa pantalla se habilita en la Fase 4 con `glowup_booking_payments_enabled()`; hasta entonces no se ofrece ningún medio de pago para reservas.
 
 ---
 
@@ -319,14 +319,16 @@ El turno es la fuente de verdad del servicio, la profesional y el precio congela
 4. Revisa el resumen y acepta los términos, la política de cancelación y el consentimiento de datos de salud.
 5. El sistema crea un turno `pending` con `hold_expires_at = ahora + 15 min`.
 6. El sistema crea una orden WooCommerce `pending` y la asocia al turno por `order_id`; guarda los metadatos del turno en la orden.
-7. La pantalla final muestra el código de reserva, el detalle y el número de pedido. **No se cobra**: el pago online se habilita en la Fase 4.
+7. La pantalla final muestra el código de reserva, el detalle y el número de pedido. El cobro está desactivado por defecto: el pago online se habilita cuando la Fase 4 active el interruptor de pagos.
 
-### 6.2 Continuación prevista (Fase 4)
+### 6.2 Continuación prevista (Fase 4 en preparación)
 
 8. La clienta paga el total con Mercado Pago desde el `order-pay` de la reserva.
 9. El webhook acredita el pago: el turno pasa a `confirmed` y la orden a `completed`.
 10. Se envía el email de confirmación a la clienta y copia al salón.
 11. Si el pago no se acredita antes del vencimiento, el hold se libera. La conciliación debe revisar la orden pendiente antes de permitir un pago tardío.
+
+La integración real se habilita cuando el plugin active `glowup_booking_payments_enabled()`; hasta entonces el tema mantiene el flujo sin cobro.
 
 ### 6.3 Máquina de estados
 
@@ -393,10 +395,11 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 
 - WooCommerce es la fuente de verdad del pedido y, en la Fase 4, del pago.
 - El turno se vincula al pedido por `appointments.order_id` y meta del pedido (`_glowup_appointment_id`).
-- En la Fase 3 la orden se crea al confirmar la retención, queda `pending` y **no se cobra**. El pago online se habilita en la Fase 4.
+- La orden se crea al confirmar la retención y queda `pending`. Con `glowup_booking_payments_enabled()` en `false` (valor por defecto), **no se cobra**; el pago online se habilita cuando la Fase 4 active ese interruptor.
 - `POST /glowup/v1/orders` valida propiedad del turno, hold vigente, consentimiento de salud, servicio y profesional activos, y un importe mayor a cero.
 - `Booking_Orders` crea un ítem de producto virtual, calcula totales, guarda los metadatos del turno y asocia la orden al turno. Si la orden ya existe, la reutiliza.
-- La pantalla `order-pay` de una reserva se exceptúa de la pausa de la tienda. Mientras no haya cobro, muestra un aviso, no ofrece medios de pago y reemplaza el botón por un enlace a Mi cuenta.
+- La pantalla `order-pay` de una reserva se exceptúa de la pausa de la tienda. Con los pagos desactivados, muestra un aviso, no ofrece medios de pago y reemplaza el botón por un enlace a Mi cuenta.
+- El tema expone `glowup_booking_payments_enabled()` con filtro homónimo. Devuelve `false` por defecto y el plugin puede activarlo cuando Mercado Pago esté configurado; también ajusta la copia del wizard y el enlace de pago de la orden.
 - El cobro es total al reservar. La configuración `deposit` existe pero no se usa en el MVP.
 - Mercado Pago se integra con el plugin oficial, que gestiona checkout, webhooks y reembolsos.
 - Los reembolsos se inician desde WooCommerce y deben reflejarse en el estado del turno.
@@ -417,7 +420,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - Los productos no se exponen al público durante el MVP: tienda, fichas, carrito y checkout de productos muestran “Próximamente”.
 - La tienda pública completa, con retiro en el salón y envío nacional, es la Fase 8 y queda fuera del MVP.
 - El costo de envío definitivo y los textos legales de compra quedan pendientes para esa fase.
-- WooCommerce sigue siendo la infraestructura de cuentas y órdenes; la pausa no desactiva el motor de cuentas. El `order-pay` de reservas ya está exceptuado de la pausa y el cobro se habilita en la Fase 4.
+- WooCommerce sigue siendo la infraestructura de cuentas y órdenes; la pausa no desactiva el motor de cuentas. El `order-pay` de reservas ya está exceptuado de la pausa y el cobro se habilita en la Fase 4 mediante `glowup_booking_payments_enabled()`.
 
 ---
 
@@ -459,7 +462,7 @@ Principio: el rol profesional no debe poder cambiar precios, servicios ajenos ni
 
 La retención usa lock por profesional, transacción y validación de solapamientos. La clave de idempotencia debe tener entre 8 y 64 caracteres alfanuméricos, guiones o guiones bajos. Los holds vencidos se marcan como `expired` y dejan de bloquear la disponibilidad.
 
-`POST /orders` recibe `appointment_id`, `terms_consent` y `health_consent` ya registrado en el turno. Responde 201 con la orden creada o 200 si reutiliza una existente. La orden incluye `order_id`, número, estado, total formateado, URL de pago, URL de detalle y segundos restantes de la retención. Los errores de sesión, propiedad, términos, consentimiento, hold vencido e importe inválido se devuelven con códigos y estados HTTP explícitos.
+`POST /orders` recibe `appointment_id`, `terms_consent` y `health_consent` ya registrado en el turno. Responde 201 con la orden creada o 200 si reutiliza una existente. La orden incluye `order_id`, número, estado, total formateado, `pay_url`, `view_url` y segundos restantes de la retención. `pay_url` alimenta el botón «Pagar mi turno» del wizard cuando `glowup_booking_payments_enabled()` es verdadero; si falta, el tema usa `view_url` como respaldo. Los errores de sesión, propiedad, términos, consentimiento, hold vencido e importe inválido se devuelven con códigos y estados HTTP explícitos.
 
 ### 9.2 Errores de reserva
 
@@ -565,9 +568,10 @@ chore: ...
 ## 14. Deuda técnica y decisiones pendientes
 
 - Wizard público, cuenta y creación de orden: Fase 3 cerrada.
+- Preparación de pagos en el tema: Fase 4 iniciada; `glowup_booking_payments_enabled()` queda apagado por defecto y el `order-pay` mantiene el flujo sin cobro.
 - Cancelación y reprogramación desde la cuenta de la clienta: pendiente antes del lanzamiento; no formaron parte del alcance cerrado de la Fase 3.
 - Conciliación de órdenes pendientes con holds vencidos: Fase 4, antes de habilitar el cobro.
-- Mercado Pago sandbox/producción y webhooks: Fase 4, bloqueado por credenciales.
+- Mercado Pago sandbox/producción y webhooks: Fase 4, bloqueado por credenciales; al integrarse, el plugin debe activar el interruptor de pagos.
 - Emails reales y recordatorios: Fase 5.
 - CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
 - Agenda operativa con vista diaria/semanal: Fase 6.
@@ -588,7 +592,7 @@ chore: ...
 
 - **Turno / appointment:** reserva de un servicio con una profesional en un rango horario.
 - **Hold / retención:** bloqueo temporal del horario mientras se completa la reserva.
-- **Orden de reserva:** pedido de WooCommerce creado desde el turno; en la Fase 3 queda pendiente y sin cobro.
+- **Orden de reserva:** pedido de WooCommerce creado desde el turno; queda pendiente y sin cobro mientras los pagos están desactivados.
 - **Slot:** horario de inicio posible según intervalo y duración.
 - **Pivote:** tabla que relaciona servicios con profesionales.
 - **Seña:** pago parcial; no se usa en el MVP.

@@ -15,7 +15,7 @@ Fase 0   Descubrimiento                        Completada
 Fase 1   Base técnica                          Completada
 Fase 2   Motor de agenda                       Completada
 Fase 3   Wizard de reserva y cuenta            Completada
-Fase 4   Pagos                                 Siguiente / bloqueada por credenciales
+Fase 4   Pagos                                 Iniciada / preparación; cobro bloqueado
 Fase 5   Emails                                Pendiente
 Fase 6   Operación                             Pendiente
 Fase 7   QA y lanzamiento                      Pendiente
@@ -136,7 +136,8 @@ orden queda pendiente de pago; el cobro se habilita en la Fase 4.
 FASE 4 — PAGOS
 ------------------------------------------------------------
 
-Estado: siguiente; bloqueada por credenciales de Mercado Pago.
+Estado: iniciada con la preparación del tema; la integración real y el
+cobro siguen bloqueados por credenciales de Mercado Pago.
 
 Objetivo:
 Cobrar el total del turno al reservar y confirmar la reserva cuando
@@ -154,8 +155,19 @@ Alcance:
 - Conciliación entre orden, pago y turno.
 - Pruebas de pago aprobado, rechazado, expirado y reembolsado.
 
+Preparación ya realizada:
+- El tema expone `glowup_booking_payments_enabled()`, apagado por
+  defecto y filtrable por el plugin.
+- Los avisos, el botón y los medios de pago del `order-pay` se
+  condicionan a ese interruptor.
+- La copia del wizard y el enlace final de la orden se adaptan al
+  estado de pagos.
+- El flujo actual sigue sin cobro mientras el interruptor esté
+  apagado.
+
 Dependencias:
-Fase 3 cerrada y credenciales de Mercado Pago disponibles.
+Fase 3 cerrada y credenciales de Mercado Pago disponibles. La
+integración real debe activar el interruptor de pagos del tema.
 
 Criterio de cierre:
 Un turno pagado queda confirmado y uno no pagado libera el horario.
@@ -333,7 +345,9 @@ ESTADO ACTUAL
 Completado:
 - Fases 0, 1, 2 y 3.
 - WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
-- Tema GlowUp 0.2.0 y plugin `glowup-turnos` 0.3.0, esquema 1.1.0.
+- Tema GlowUp 0.3.0 y plugin `glowup-turnos` 0.3.0, esquema 1.1.0.
+- Fase 4 iniciada: interruptor de pagos apagado por defecto y
+  `order-pay` condicionado a ese estado.
 - 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
 - 18 productos cargados como catálogo interno.
 - API de disponibilidad, holds, órdenes y turnos.
@@ -350,15 +364,17 @@ Nota sobre la tienda:
 - La base técnica de la tienda sigue siendo parte de la Fase 1; la
   tienda pública completa es la Fase 8.
 
-Siguiente:
-- Fase 4: Mercado Pago, webhooks y conciliación de órdenes pendientes.
+En curso:
+- Fase 4: preparación del tema terminada; faltan Mercado Pago,
+  webhooks y conciliación de órdenes pendientes.
 
 Pendiente funcional:
 - Cancelación y reprogramación desde la cuenta de la clienta.
 - Emails transaccionales y recordatorios.
 
 Bloqueado:
-- Fase 4: credenciales de Mercado Pago.
+- Fase 4: credenciales de Mercado Pago y pasarela operativa para
+  activar el interruptor de pagos.
 
 Pendiente de terceros:
 - Fotos y logo definitivos.
@@ -370,7 +386,8 @@ Pendiente de terceros:
 PRÓXIMOS PASOS
 ------------------------------------------------------------
 
-1. Integrar Mercado Pago en sandbox cuando estén las credenciales.
+1. Integrar Mercado Pago en sandbox cuando estén las credenciales y,
+   recién entonces, activar `glowup_booking_payments_enabled()`.
 2. Conciliar órdenes pendientes con holds vencidos antes de habilitar el cobro.
 3. Definir e implementar cancelación y reprogramación desde la cuenta.
 4. Implementar emails transaccionales.

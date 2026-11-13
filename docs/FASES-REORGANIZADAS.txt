@@ -2,7 +2,7 @@
 GLOWUP — FASES REORGANIZADAS
 ============================================================
 
-Actualizado: 11 de noviembre de 2026
+Actualizado: 12 de noviembre de 2026
 Criterio: lanzar primero el sitio de marca y las reservas con pago.
 La tienda online pasa a una fase futura y, durante el MVP, solo
 muestra un cartel de "Próximamente".
@@ -14,8 +14,8 @@ RESUMEN
 Fase 0   Descubrimiento                        Completada
 Fase 1   Base técnica                          Completada
 Fase 2   Motor de agenda                       Completada
-Fase 3   Wizard de reserva y cuenta            Siguiente
-Fase 4   Pagos                                 Bloqueada por credenciales
+Fase 3   Wizard de reserva y cuenta            Completada
+Fase 4   Pagos                                 Siguiente / bloqueada por credenciales
 Fase 5   Emails                                Pendiente
 Fase 6   Operación                             Pendiente
 Fase 7   QA y lanzamiento                      Pendiente
@@ -105,7 +105,7 @@ de prueba al cierre.
 FASE 3 — WIZARD DE RESERVA Y CUENTA
 ------------------------------------------------------------
 
-Estado: siguiente. No iniciada.
+Estado: completada.
 
 Objetivo:
 Permitir que una clienta se registre, elija un turno y genere una
@@ -117,7 +117,7 @@ Alcance:
 - Selección de servicio, profesional, fecha y horario.
 - Consulta de disponibilidad contra `glowup/v1`.
 - Creación de la retención del horario.
-- Creación de la orden de WooCommerce asociada al turno.
+- Creación de la orden de WooCommerce asociada al turno (`POST /orders`).
 - Resumen previo al pago con servicio, profesional, fecha, hora,
   duración y precio.
 - Manejo de errores: horario ocupado, retención vencida, sesión
@@ -129,13 +129,14 @@ Fase 2 cerrada.
 
 Criterio de cierre:
 Una clienta autenticada puede elegir un horario disponible, retenerlo
-y llegar al resumen de pago sin errores ni superposiciones.
+y llegar al resumen de la orden sin errores ni superposiciones. La
+orden queda pendiente de pago; el cobro se habilita en la Fase 4.
 
 ------------------------------------------------------------
 FASE 4 — PAGOS
 ------------------------------------------------------------
 
-Estado: bloqueada por credenciales de Mercado Pago.
+Estado: siguiente; bloqueada por credenciales de Mercado Pago.
 
 Objetivo:
 Cobrar el total del turno al reservar y confirmar la reserva cuando
@@ -148,6 +149,7 @@ Alcance:
   reembolsado.
 - Confirmación automática del turno al acreditarse el pago.
 - Liberación del horario si el pago no se completa.
+- Conciliación de órdenes pendientes cuyos holds vencieron.
 - Reembolsos por cancelación dentro del plazo de 24 horas.
 - Conciliación entre orden, pago y turno.
 - Pruebas de pago aprobado, rechazado, expirado y reembolsado.
@@ -260,8 +262,8 @@ Durante el MVP:
   para no perder el trabajo ya hecho.
 - WooCommerce sigue activo para cuentas y órdenes de reservas; lo que
   se pausa es la tienda pública, no el motor de cuentas.
-- La pausa aplica a la compra de productos. El checkout de una reserva
-  se habilita en la Fase 4 y no se considera parte de la tienda.
+- La pausa aplica a la compra de productos. La pantalla de pago de una
+  reserva ya se exceptúa de la pausa; el cobro se habilita en la Fase 4.
 
 Alcance futuro:
 - Catálogo público con categorías y fichas de producto.
@@ -329,13 +331,14 @@ ESTADO ACTUAL
 ------------------------------------------------------------
 
 Completado:
-- Fases 0, 1 y 2.
+- Fases 0, 1, 2 y 3.
 - WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
-- Tema GlowUp y plugin `glowup-turnos` 0.2.1, esquema 1.1.0.
+- Tema GlowUp 0.2.0 y plugin `glowup-turnos` 0.3.0, esquema 1.1.0.
 - 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
 - 18 productos cargados como catálogo interno.
-- API de disponibilidad, holds y turnos.
+- API de disponibilidad, holds, órdenes y turnos.
 - Agenda de bloqueos en el panel.
+- Wizard público de reserva con cuenta, retención y orden pendiente.
 - Tienda pública pausada: `/tienda/`, fichas de producto, carrito y
   checkout de productos muestran "Muy pronto". Home y encabezado
   adaptados a la pausa.
@@ -348,7 +351,11 @@ Nota sobre la tienda:
   tienda pública completa es la Fase 8.
 
 Siguiente:
-- Fase 3: wizard público de reserva y creación de la orden.
+- Fase 4: Mercado Pago, webhooks y conciliación de órdenes pendientes.
+
+Pendiente funcional:
+- Cancelación y reprogramación desde la cuenta de la clienta.
+- Emails transaccionales y recordatorios.
 
 Bloqueado:
 - Fase 4: credenciales de Mercado Pago.
@@ -363,12 +370,13 @@ Pendiente de terceros:
 PRÓXIMOS PASOS
 ------------------------------------------------------------
 
-1. Construir la Fase 3: wizard de reserva y cuenta.
-2. Integrar Mercado Pago en sandbox cuando estén las credenciales.
-3. Implementar emails transaccionales.
-4. Completar la agenda operativa del panel.
-5. Ejecutar QA, cargar fotos y textos legales, y lanzar.
-6. Recién después, abrir la tienda online como Fase 8.
+1. Integrar Mercado Pago en sandbox cuando estén las credenciales.
+2. Conciliar órdenes pendientes con holds vencidos antes de habilitar el cobro.
+3. Definir e implementar cancelación y reprogramación desde la cuenta.
+4. Implementar emails transaccionales.
+5. Completar la agenda operativa del panel.
+6. Ejecutar QA, cargar fotos y textos legales, y lanzar.
+7. Recién después, abrir la tienda online como Fase 8.
 
 ============================================================
 Fin del documento.

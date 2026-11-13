@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.3.0
-**Actualizado:** 11 de noviembre de 2026
-**Estado:** Fase 2 completada. La Fase 3 (wizard público y creación de orden) es el siguiente paso. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Versión:** 0.4.0
+**Actualizado:** 12 de noviembre de 2026
+**Estado:** Fase 3 completada. La Fase 4 (pagos) es el siguiente paso, bloqueada por credenciales de Mercado Pago. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -16,7 +16,7 @@ GlowUp es un salón de estética integral en La Rioja capital. El proyecto const
 
 La implementación se apoya en WordPress y WooCommerce para cuentas, pedidos y pagos. La lógica de agenda vive en un plugin propio, `glowup-turnos`, para no mezclar reglas de negocio con la presentación. El tema `temaestetica` conserva el slug técnico y muestra la marca **GlowUp**.
 
-El trabajo se desarrolla por fases. Al cierre de este documento están completas la base técnica, el tema, el contenido inicial, los roles, las tablas de reservas, el catálogo interno y el motor de agenda de la Fase 2. La agenda ya calcula disponibilidad, aplica bloqueos y retiene horarios, pero todavía no acepta reservas públicas: `/turnos/` muestra un estado “próximamente” hasta que el wizard y el cobro estén listos. La tienda pública también está pausada: `/tienda/`, el carrito y el checkout de productos muestran un cartel de “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
+El trabajo se desarrolla por fases. La Fase 3 ya está cerrada: `/turnos/` permite crear una cuenta o iniciar sesión, elegir servicio, profesional, fecha y horario, retener el lugar por 15 minutos y generar una orden de WooCommerce asociada al turno. **Todavía no se cobra**: la orden queda pendiente de pago y el checkout online se habilita en la Fase 4. La tienda pública de productos sigue pausada: `/tienda/`, las fichas de producto, el carrito y el checkout de productos muestran “Próximamente”, mientras WooCommerce sigue activo para cuentas y órdenes de reservas.
 
 ---
 
@@ -49,19 +49,22 @@ Publicar un sitio de estética integral que permita conocer los servicios del sa
 - Página de contacto con dirección a confirmar en La Rioja capital, horarios, email y teléfono.
 - Preguntas frecuentes y políticas de cancelación, privacidad y términos.
 - Tienda pública con un cartel de “Próximamente”: sin catálogo, precios, carrito ni checkout de productos durante el MVP.
-- Página de turnos con estado “próximamente” mientras el wizard no esté operativo.
+- Página de turnos con el wizard público: cuenta, selección de servicio, profesional, fecha y horario, retención y resumen previo al pago.
 
 ### 3.2 Reservas
 
 - Reserva exclusiva para clientas con cuenta.
+- Registro e ingreso dentro de `/turnos/`, sin salir del flujo de reserva.
 - Selección de servicio, profesional, fecha y horario.
+- Consulta de disponibilidad contra la API del plugin y creación de una retención de 15 minutos.
+- Creación automática de una orden de WooCommerce asociada al turno, en estado pendiente de pago.
 - Pago total al reservar. La seña queda configurada como opción futura, no como modo activo.
-- Retención del horario durante 15 minutos mientras se completa el pago.
-- Confirmación automática al acreditarse el pago.
-- Cancelación con reembolso hasta 24 horas antes del turno.
-- Reprogramación hasta 12 horas antes del turno.
-- Recordatorios por email 24 horas y 2 horas antes.
+- Confirmación automática al acreditarse el pago (Fase 4).
+- Cancelación con reembolso hasta 24 horas antes del turno (pendiente de implementación).
+- Reprogramación hasta 12 horas antes del turno (pendiente de implementación).
+- Recordatorios por email 24 horas y 2 horas antes (Fase 5).
 - Registro de consentimiento para datos de salud cuando el servicio lo requiera.
+- Manejo explícito de horario ocupado, retención vencida, sesión vencida y doble envío.
 
 ### 3.3 Tienda (futura, fuera del MVP)
 
@@ -73,6 +76,7 @@ La tienda pública completa es la **Fase 8** y no forma parte del MVP. Durante e
 - El icono del carrito se oculta del encabezado y la sección de tienda de la home se reemplaza por un aviso de “Próximamente”.
 - Los 18 productos quedan cargados como catálogo interno, sin exposición pública, para no perder el trabajo ya hecho.
 - WooCommerce sigue activo para cuentas, órdenes y el checkout de reservas de la Fase 4. Lo que se pausa es la tienda pública de productos, no el motor de cuentas.
+- La pantalla de pago de una orden de reserva se exceptúa de la pausa para que el flujo pueda revisarse y completarse en la Fase 4.
 
 Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkout, stock, cupones, retiro en el salón, envío nacional con costos definidos, gift card, devoluciones y textos legales de compra.
 
@@ -97,6 +101,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | Cobro | Pago total al reservar; la seña queda como opción futura |
 | Pasarela | Mercado Pago mediante el plugin oficial |
 | Retención de horario | 15 minutos mientras se completa el pago |
+| Orden de reserva | Se crea en la Fase 3 sin cobro, queda `pending` y se asocia al turno |
 | Cancelación | Hasta 24 h antes con reembolso; fuera de plazo, sin reembolso |
 | Reprogramación | Hasta 12 h antes |
 | Recordatorios | Solo email; WhatsApp queda cancelado |
@@ -119,8 +124,8 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 0. Descubrimiento | Relevamiento, decisiones de negocio, alcance y stack | Completada |
 | 1. Base técnica | Entorno local, backup, WooCommerce, tema, plugin base, contenido y tienda inicial | Completada |
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
-| 3. Wizard de reserva | Flujo público, cuenta, selección de servicio/profesional/horario y creación de orden | Siguiente |
-| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Pendiente / bloqueada por credenciales |
+| 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
+| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Siguiente / bloqueada por credenciales |
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
@@ -137,8 +142,8 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Backup de la base anterior en `C:\xampp\backups\esteticaweb\estetica_bd-20261108-230343.sql`.
 - WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 instalado e inactivo.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
-- Tema GlowUp activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
-- Plugin `glowup-turnos` activo en versión 0.2.1 con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
+- Tema GlowUp 0.2.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
+- Plugin `glowup-turnos` 0.3.0 activo con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
 - Motor de agenda de la Fase 2: disponibilidad por servicio, profesional y fecha; pausas, excepciones y anticipación mínima/máxima.
 - Retención de horarios durante 15 minutos con lock por profesional, transacción, idempotencia y prevención de solapamientos.
 - API REST de disponibilidad, creación de retenciones y consulta de turnos de la clienta autenticada.
@@ -149,14 +154,26 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - 18 productos en 5 categorías, con SKU, stock, descripciones y precios, cargados como catálogo interno.
 - Tienda pública pausada con una plantilla propia: `/tienda/`, las fichas de producto, `/carrito/` y el checkout de productos muestran “Muy pronto” a las visitantes. Administradoras y encargadas de tienda siguen viendo la tienda real para gestionarla.
 - Home y encabezado adaptados a la pausa: la sección de tienda se reemplaza por un aviso de “Próximamente” y el icono del carrito se oculta a las visitantes.
-- Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP ni desbordes horizontales. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
+- Wizard público en `/turnos/`: registro e ingreso inline, selección de servicio, profesional, fecha y horario, resumen, consentimientos y creación de la orden.
+- Creación de la orden de WooCommerce desde el plugin: `POST /glowup/v1/orders`, asociación por `order_id`, metadatos del turno y reutilización idempotente ante doble envío.
+- La retención vence a los 15 minutos y el wizard muestra el contador. Si el horario se ocupa o la retención vence, el flujo ofrece elegir otro horario sin perder el estado.
+- La pantalla de pago de una orden de reserva queda exceptuada de la pausa de la tienda. Mientras no exista cobro, muestra un aviso, oculta el botón de pago y ofrece volver a Mi cuenta.
+- Errores verificados: horario ocupado (409), retención vencida (409), sesión vencida (403) y doble envío de orden (reutilización idempotente).
+- Accesibilidad 100 y Best Practices 100 en Lighthouse; sin desbordes horizontales en la verificación responsive.
+- Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
 - Checkout con carrito real verificado con una cuenta de gestión: artículo, total, métodos de entrega y botón de compra.
 - Sincronización del contador del carrito corregida para el carrito por bloques; el contador queda oculto mientras la tienda pública está pausada.
-- Datos de prueba de la Fase 2 limpiados: 0 turnos y 0 bloqueos al cierre.
+- Datos de prueba de la Fase 3 limpiados: 0 turnos y 0 órdenes de reserva al cierre.
 
 ### Próximo paso
 
-- Fase 3: wizard público de reserva y creación de la orden WooCommerce. Todavía no está iniciada; requiere confirmación explícita para arrancar.
+- Fase 4: integrar Mercado Pago en sandbox, conectar el pago de la orden de reserva, mapear webhooks a estados del turno y conciliar órdenes pendientes con retenciones vencidas. Está bloqueada hasta contar con credenciales.
+
+### Pendientes funcionales
+
+- Cancelación y reprogramación desde la cuenta de la clienta. No formaron parte del alcance cerrado de la Fase 3 y deben resolverse antes del lanzamiento.
+- Emails transaccionales y recordatorios de la Fase 5.
+- Agenda operativa completa y edición de horarios de la Fase 6.
 
 ### Bloqueado o pendiente de terceros
 
@@ -189,7 +206,9 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | --- | --- | --- |
 | Credenciales de Mercado Pago tardías | Bloquea pagos y confirmación automática | Probar en sandbox apenas estén; dejar webhook y estados preparados |
 | Medios de pago no instantáneos | El turno puede liberarse antes de acreditarse | Definir ventana según medio; evaluar extender retención o confirmar manualmente |
+| Orden pendiente con retención vencida | La clienta puede llegar a pagar un horario ya liberado | La Fase 4 debe conciliar la orden antes del pago y cancelar o reasignar si el hold venció |
 | Doble reserva por concurrencia | Mala experiencia y conflicto operativo | Bloqueo transaccional y revalidación antes de insertar |
+| Doble envío de orden | Órdenes duplicadas | Lock por turno e idempotencia; la orden existente se reutiliza |
 | Datos de salud | Riesgo legal y de privacidad | Consentimiento explícito, acceso restringido y retención definida |
 | Fotos y marca pendientes | El sitio queda con placeholders | Slots de imagen reemplazables y carga posterior sin tocar código |
 | Emails que caen en spam | Clientas sin recordatorio | Configurar SPF/DKIM en producción y probar entregabilidad |
@@ -202,9 +221,9 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ## 9. Próximos pasos
 
-1. Construir el wizard público de reserva y el flujo de cuenta en `/turnos/` (Fase 3).
-2. Crear la orden de WooCommerce al confirmar la retención y asociarla al turno (Fase 3).
-3. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno (Fase 4).
+1. Integrar Mercado Pago en sandbox y mapear webhooks a estados de turno y orden (Fase 4).
+2. Resolver la conciliación de órdenes pendientes cuando la retención vence, antes de habilitar el cobro (Fase 4).
+3. Definir e implementar cancelación y reprogramación desde la cuenta (antes del lanzamiento).
 4. Implementar emails transaccionales y recordatorios (Fase 5).
 5. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios (Fase 6).
 6. Reemplazar placeholders con fotos y cerrar textos legales.
@@ -221,3 +240,4 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2026-11-09 | Cierre de Fase 2: disponibilidad, excepciones, retenciones, anti-solapamiento, API REST y agenda de bloqueos. |
 | 2026-11-10 | Ajuste de negocio: ubicación en La Rioja capital, zona horaria `America/Argentina/La_Rioja` y depilación solo definitiva por zona más pack completo. Plugin 0.2.1. |
 | 2026-11-11 | Reorganización de fases: la tienda pública pasa a la Fase 8 (futura) y Post-MVP a la Fase 9. Durante el MVP, tienda, carrito y checkout de productos muestran “Próximamente”. WooCommerce sigue activo para cuentas y órdenes de reservas. |
+| 2026-11-12 | Cierre de Fase 3: wizard público, registro e ingreso, disponibilidad, retención, orden de WooCommerce asociada y resumen previo al pago. Plugin 0.3.0 y tema 0.2.0. La Fase 4 queda como siguiente paso, bloqueada por credenciales de Mercado Pago. |

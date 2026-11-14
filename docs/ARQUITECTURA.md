@@ -196,7 +196,7 @@ glowup-turnos/
 2. Se crean las tablas con `dbDelta()`.
 3. Se crea el rol `glowup_professional` y se otorgan capacidades.
 4. Se guardan los ajustes por defecto y se siembran servicios, profesionales, horarios y relaciones.
-5. Se programa el cron horario `glowup_turnos_cleanup_holds`.
+5. Se programa el cron horario `glowup_turnos_cleanup_holds`; en cada arranque, `Activator::ensure_cron()` lo reprograma si falta.
 6. En cada carga, `Activator::maybe_upgrade()` compara `glowup_turnos_version` y reinstala de forma idempotente si cambió.
 7. Al desinstalar, los datos se conservan salvo que `GLOWUP_TURNOS_REMOVE_DATA` sea verdadero.
 
@@ -408,7 +408,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
   - `woocommerce_order_status_cancelled` y `woocommerce_order_status_refunded` cancelan el turno.
   - `woocommerce_order_needs_payment` bloquea el pago si el turno no está `pending` o si el hold venció.
   - `woocommerce_before_pay_action` resincroniza `billing_email`, nombre y apellido desde la cuenta de la clienta antes de que la pasarela arme el pago.
-  - La conciliación del cron (`glowup_turnos_cleanup_holds`) marca los holds vencidos como `expired` y cancela sus órdenes `pending`/`failed`.
+  - La conciliación del cron (`glowup_turnos_cleanup_holds`) marca los holds vencidos como `expired` y cancela sus órdenes `pending`/`failed`. El evento se asegura en cada arranque con `Activator::ensure_cron()`, además de la activación del plugin.
 - Pago tardío: si el horario sigue libre y el turno es futuro, se confirma; si el horario ya está ocupado, el turno queda `expired` y la orden se marca con `_glowup_payment_review=yes`. Los estados `cancelled`, `completed` y `no_show` nunca se resucitan automáticamente: siempre van a revisión manual.
 - La pantalla `order-pay` de una reserva se exceptúa de la pausa de la tienda. El tema muestra el aviso y el botón de pago según `glowup_booking_payments_available()`, que detecta pasarelas disponibles cuyo ID empieza con `woo-mercado-pago` y admite el filtro `glowup_booking_payments_available` para pruebas o extensiones.
 - Si la retención venció, el tema redirige a `/turnos/?glowup_pay=expired` antes de renderizar el formulario de pago. El plugin vuelve a validar del lado del servidor.
@@ -423,10 +423,10 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - El estado del pedido y el estado del turno se mapean explícitamente: pagado → `confirmed`, cancelado/reembolsado → `cancelled`, hold vencido → `expired`.
 - Una orden `pending` puede sobrevivir a su retención: el cron la cancela y el pago queda bloqueado. Si el pago llega después, se confirma solo con horario libre o se marca para revisión.
 - Mercado Pago 8.10.0 está activo en modo test con credenciales de sandbox. El checkout y la confirmación automática del turno ya se probaron con un pago aprobado.
-- Las credenciales de producción están cargadas, pero todavía no se validaron end-to-end. Antes de cobrar en producción hay que probar webhooks, reembolsos y conciliación con la cuenta real.
+- Las credenciales de producción están cargadas, pero la validación con la cuenta real queda fuera de alcance por ahora: el proyecto se mantiene como práctica local y no se publica.
 - Con la pasarela test disponible, `glowup_booking_payments_available()` devuelve `true` y el wizard/`order-pay` muestran el pago real.
 - No se deben commitear credenciales; se cargan en la configuración de WooCommerce o en constantes de `wp-config.php`.
-- Verificación de la Fase 4: 17 comprobaciones de WP-CLI sobre pago normal, guarda, conciliación, pagos tardíos con y sin horario libre, cancelación y reembolso; pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (sin pasarela y con pasarela simulada por filtro); y un pago aprobado en sandbox que confirmó el turno automáticamente. Los datos de prueba se eliminaron al cierre.
+- Verificación de la Fase 4: 17 comprobaciones de WP-CLI sobre pago normal, guarda, conciliación, pagos tardíos con y sin horario libre, cancelación y reembolso; pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (sin pasarela y con pasarela simulada por filtro); un pago aprobado en sandbox que confirmó el turno automáticamente; y la conciliación real del cron, que marcó un turno vencido como `expired` y canceló su pedido `pending`. Los datos de prueba se eliminaron al cierre.
 
 ### 7.3 Productos y tienda futura
 
@@ -584,7 +584,7 @@ chore: ...
 
 - Wizard público, cuenta, creación de orden y núcleo de pagos: Fases 3 y 4 implementadas.
 - Cancelación y reprogramación desde la cuenta de la clienta: pendiente antes del lanzamiento. La cancelación/reembolso desde WooCommerce ya se refleja en el turno.
-- Activación de Mercado Pago sandbox/producción, credenciales, webhooks y pruebas end-to-end: Fase 4, bloqueado por credenciales.
+- Mercado Pago en sandbox: webhooks, pagos rechazados/pendientes y reembolsos end-to-end. La producción queda fuera de alcance por ahora.
 - Emails reales y recordatorios: Fase 5.
 - CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
 - Agenda operativa con vista diaria/semanal: Fase 6.

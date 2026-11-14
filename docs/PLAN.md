@@ -2,7 +2,7 @@
 
 **Versión:** 0.5.0
 **Actualizado:** 13 de noviembre de 2026
-**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: la guarda de pago, el mapeo orden→turno y la conciliación de retenciones vencidas ya están implementados; la activación de Mercado Pago y las pruebas end-to-end siguen bloqueadas por credenciales. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: el checkout de Mercado Pago en sandbox ya funciona y confirma el turno automáticamente; faltan webhooks, reembolsos y conciliación end-to-end, además de la validación en producción. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -128,7 +128,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 1. Base técnica | Entorno local, backup, WooCommerce, tema, plugin base, contenido y tienda inicial | Completada |
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
 | 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
-| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | En curso: núcleo implementado, activación bloqueada por credenciales |
+| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | En curso: checkout sandbox y confirmación automática verificados; faltan webhooks, reembolsos y conciliación end-to-end |
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
@@ -143,7 +143,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 - Entorno local XAMPP con WordPress, PHP 8.2 y MariaDB.
 - Backup de la base anterior en `C:\xampp\backups\esteticaweb\estetica_bd-20261108-230343.sql`.
-- WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 instalado e inactivo.
+- WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 activo en modo test/sandbox.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
 - Tema GlowUp 0.2.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
 - Plugin `glowup-turnos` 0.4.0 activo con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
@@ -167,6 +167,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Fase 4 (núcleo): un pago tardío confirma el turno si el horario sigue libre y es futuro; si ya está ocupado o el turno fue cancelado, deja la orden marcada para revisión manual y reembolso.
 - Fase 4 (tema): los textos de pago, el CTA del wizard, el aviso de `order-pay` y el botón de pago se adaptan a si hay una pasarela de Mercado Pago disponible.
 - Fase 4 verificada con 17 comprobaciones de WP-CLI y pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (con y sin pasarela simulada), sin errores de PHP.
+- Fase 4 (sandbox): un pago aprobado con la cuenta de prueba confirmó el turno automáticamente y dejó la orden en `processing`.
 - Errores verificados: horario ocupado (409), retención vencida (409), sesión vencida (403) y doble envío de orden (reutilización idempotente).
 - Accesibilidad 100 y Best Practices 100 en Lighthouse; sin desbordes horizontales en la verificación responsive.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
@@ -176,18 +177,18 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ### Próximo paso
 
-- Fase 4: activar Mercado Pago en sandbox apenas existan credenciales, probar checkout, webhooks y reembolsos end-to-end, y validar la conciliación con pagos reales. El núcleo de confirmación, cancelación y holds vencidos ya está implementado.
+- Fase 4: validar webhooks, reembolsos y conciliación end-to-end en sandbox, y después repetir con credenciales de producción. El checkout y la confirmación automática ya están verificados.
 
 ### Pendientes funcionales
 
 - Cancelación y reprogramación desde la cuenta de la clienta. La cancelación y el reembolso ya se reflejan cuando se cancelan o reembolsan desde WooCommerce, pero falta la acción de la clienta. Deben resolverse antes del lanzamiento.
-- Activar Mercado Pago y cargar credenciales de sandbox para cerrar la Fase 4.
+- Validar webhooks, reembolsos y conciliación end-to-end en sandbox, y después en producción.
 - Emails transaccionales y recordatorios de la Fase 5.
 - Agenda operativa completa y edición de horarios de la Fase 6.
 
 ### Bloqueado o pendiente de terceros
 
-- Credenciales de Mercado Pago para probar checkout, webhooks y reembolsos.
+- Cuenta y credenciales de producción de Mercado Pago validadas para cobrar de verdad.
 - Fotos reales, logo y textos legales definitivos.
 - Hosting, dominio y correo de producción.
 - Costos de envío y dirección exacta del salón, necesarios para abrir la tienda en la Fase 8.
@@ -214,7 +215,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 | Riesgo | Impacto | Mitigación |
 | --- | --- | --- |
-| Credenciales de Mercado Pago tardías | Bloquea pagos y confirmación automática | Probar en sandbox apenas estén; dejar webhook y estados preparados |
+| Validación de producción de Mercado Pago | Bloquea el cobro real | Repetir checkout, webhooks y reembolsos con credenciales reales antes de publicar |
 | Medios de pago no instantáneos | El turno puede liberarse antes de acreditarse | Definir ventana según medio; evaluar extender retención o confirmar manualmente |
 | Orden pendiente con retención vencida | La clienta puede llegar a pagar un horario ya liberado | La guarda bloquea el pago y la conciliación cancela la orden; si el pago llega igual, se confirma solo con horario libre o se marca para revisión manual |
 | Doble reserva por concurrencia | Mala experiencia y conflicto operativo | Bloqueo transaccional y revalidación antes de insertar |
@@ -231,7 +232,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ## 9. Próximos pasos
 
-1. Activar Mercado Pago en sandbox, conectar el pago de la orden, mapear webhooks a estados del turno y validar la conciliación end-to-end (Fase 4).
+1. Validar webhooks, reembolsos y conciliación end-to-end en sandbox, y repetir con producción (Fase 4).
 2. Definir e implementar cancelación y reprogramación desde la cuenta (antes del lanzamiento).
 3. Implementar emails transaccionales y recordatorios (Fase 5).
 4. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios (Fase 6).

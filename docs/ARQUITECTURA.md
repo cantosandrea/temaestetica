@@ -307,7 +307,7 @@ La orden se crea desde `Booking_Orders` y guarda una copia de los datos del turn
 - `_glowup_service_id`, `_glowup_professional_id`, `_glowup_booking_start` y `_glowup_hold_expires_at`.
 - `_glowup_health_consent` y `_glowup_terms_consent`: consentimientos registrados.
 - `_glowup_payment_review` = `yes`: pago tardío que no pudo confirmarse y requiere revisión manual y reembolso.
-- El ítem de línea es un producto virtual sin `product_id`, con nombre del servicio, subtotal, total y metadatos de turno, fecha, hora, profesional y duración.
+- El ítem de línea usa el producto virtual oculto `Turno GlowUp` (SKU `glowup-turno`) como producto real de WooCommerce, con el nombre del servicio, subtotal, total y metadatos de turno, fecha, hora, profesional y duración. Mercado Pago necesita que cada línea resuelva un `WC_Product`; por eso no se usa `product_id = 0`.
 
 El turno es la fuente de verdad del servicio, la profesional y el precio congelado al reservar. La orden es la fuente de verdad del pedido y del pago.
 
@@ -401,7 +401,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - WooCommerce es la fuente de verdad del pedido y del pago. La orden se crea al confirmar la retención, queda `pending` y solo se cobra cuando hay una pasarela disponible.
 - El turno se vincula al pedido por `appointments.order_id` y meta del pedido (`_glowup_appointment_id`). `Booking_Orders::get_appointment_for_order()` resuelve el turno desde la orden y `Appointments_Repository::get_by_order_id()` lo busca por `order_id`.
 - `POST /glowup/v1/orders` valida propiedad del turno, hold vigente, consentimiento de salud, servicio y profesional activos, y un importe mayor a cero.
-- `Booking_Orders` crea un ítem de producto virtual, calcula totales, guarda los metadatos del turno y asocia la orden al turno. Si la orden ya existe, la reutiliza.
+- `Booking_Orders` reutiliza o crea el producto virtual oculto `Turno GlowUp` y agrega la reserva con `add_product()`, ajustando nombre y precio por turno. Después calcula totales, guarda los metadatos del turno y asocia la orden al turno. Si ya existe una orden pagable, la reutiliza; las órdenes canceladas, reembolsadas o en papelera no se reutilizan.
 - `Booking_Payments` (plugin) implementa el mapeo orden→turno:
   - `woocommerce_order_payment_status_changed` y el fallback `woocommerce_order_status_changed` confirman el turno cuando la orden pasa a un estado pagado (`processing`/`completed`).
   - `woocommerce_order_status_cancelled` y `woocommerce_order_status_refunded` cancelan el turno.

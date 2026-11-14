@@ -4,9 +4,9 @@
 
 - Tema clásico híbrido de WordPress para GlowUp. El slug técnico es `temaestetica` y el text domain también; no los cambies aunque la marca visible sea GlowUp.
 - Es un tema clásico con `theme.json`, no un block theme: no agregues `templates/*.html` ni `parts/`.
-- Versiones de referencia: tema `0.2.0`, plugin `0.4.0`, esquema `1.1.0`, docs `0.6.0`.
+- Versiones de referencia: tema `0.2.0`, plugin `0.4.0`, esquema `1.1.0`, docs `0.6.1`.
 - La lógica de reservas vive en el plugin hermano `C:\xampp\htdocs\esteticaweb\wp-content\plugins\glowup-turnos` (repo Git separado). El tema solo consume sus repositorios y su REST; no pongas reglas de agenda acá.
-- Fase 3 cerrada y Fase 4 cerrada en sandbox: `/turnos/` tiene wizard público, retención y orden; Mercado Pago confirmó turnos con notificaciones reales (pendiente, rechazado, aprobado), la conciliación de holds vencidos está verificada con el cron real y el reembolso completo desde WooCommerce deja pedido `refunded` y turno `cancelled`. La producción queda fuera de alcance por ahora: el proyecto es una práctica local y no se publica. El próximo paso es la Fase 5 (emails y recordatorios), bloqueada en local porque `wp_mail` falla.
+- Fase 3 cerrada y Fase 4 cerrada en sandbox: `/turnos/` tiene wizard público, retención y orden; Mercado Pago confirmó turnos con notificaciones reales (pendiente, rechazado, aprobado), la conciliación de holds vencidos está verificada con el cron real y el reembolso completo desde WooCommerce deja pedido `refunded` y turno `cancelled`. La producción queda fuera de alcance por ahora: el proyecto es una práctica local y no se publica. El próximo paso es la Fase 5 (emails y recordatorios); sus prerrequisitos ya están resueltos: Mailpit + WP Mail SMTP verificados y matriz definida en `docs/EMAILS.md`.
 - Mercado Pago `8.10.0` está activo en modo test/sandbox (`woo-mercado-pago-basic`). Las credenciales de producción están cargadas pero sin validar, y no hace falta validarlas mientras el proyecto siga siendo una práctica local: no prometas cobro real, no propongas despliegue, no expongas ni commitees claves y no cambies de modo sin pedido explícito. Sin pasarela disponible, el wizard y `order-pay` muestran el aviso de pago futuro.
 - Negocio: La Rioja capital; depilación **solo definitiva** (axilas, bozo, cavado, piernas, brazos y bikini, más un pack completo, todos con evaluación previa). No reintroduzcas servicios de cera. Precios ARS con IVA incluido; pago total al reservar; cancelación con reembolso hasta 24 h antes; reprogramación hasta 12 h antes; recordatorios solo por email (sin WhatsApp). Gift card simple incluida; packs/bonos completos y facturación fiscal quedan para post-MVP.
 - Desarrollo local en `http://localhost/esteticaweb`; WordPress 7.1.4, PHP 8.2.12, MariaDB en `localhost:3307`.
@@ -22,6 +22,7 @@
 - Lint del plugin: el mismo comando dentro de `C:\xampp\htdocs\esteticaweb\wp-content\plugins\glowup-turnos`.
 - WP-CLI: `C:\xampp\php\php.exe C:\xampp\wp-cli\wp-cli.phar --path=C:\xampp\htdocs\esteticaweb <comando>`
 - Para datos/opciones o smoke tests, usá `wp eval-file archivo.php`; evita `wp eval` con comillas anidadas en PowerShell. No hay WC-CLI completo (`wp wc` no expone `order`): para pedidos usá `wc_get_order()`/`wc_get_order_notes()` dentro de `eval-file`.
+- Correo local: Mailpit en `C:\xampp\mailpit` (SMTP `127.0.0.1:1025`, bandeja `http://127.0.0.1:8025`). Se inicia con `C:\xampp\mailpit\mailpit.exe --smtp 127.0.0.1:1025 --listen 127.0.0.1:8025 --database C:\xampp\mailpit\mailpit.db`; hay un acceso directo en el inicio de sesión. WP Mail SMTP está activo y configurado contra ese SMTP.
 
 No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sirven directo: editá `assets/css/main.css`, `assets/js/main.js` y `assets/js/booking.js`; no busques un paso de build.
 
@@ -54,9 +55,9 @@ No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sir
 
 ## Documentación y verificación
 
-- `docs/PLAN.md` y `docs/ARQUITECTURA.md` (en español) son la referencia de alcance, modelo de datos y fases. Mantenelos sincronizados con el código; `docs/GlowUp-Proyecto.docx` es la versión formal (binaria: no la edites a mano).
-- La documentación de fases puede quedar desfasada y el README del plugin quedó en `0.2.0`/Fase 2: contrastá siempre con `glowup-turnos.php`, `class-rest-api.php` y `class-booking-payments.php` antes de asumir un estado.
+- `docs/PLAN.md`, `docs/ARQUITECTURA.md` y `docs/EMAILS.md` (en español) son la referencia de alcance, modelo de datos, fases y emails. Mantenelos sincronizados con el código; `docs/GlowUp-Proyecto.docx` es la versión formal (binaria: no la edites a mano).
+- La documentación de fases puede quedar desfasada: contrastá siempre con `glowup-turnos.php`, `class-rest-api.php`, `class-booking-payments.php` y el README del plugin antes de asumir un estado.
 - Antes de cerrar un cambio: `php -l` sobre los archivos tocados, `node --check` sobre el JS tocado, WP-CLI para datos/opciones y navegador para render, consola, enlaces y responsive. No hay tests automatizados.
-- En local `wp_mail` falla (“No se pudo establecer la función de correo”): los emails de pedido no llegan y eso no es un bug del flujo de reserva; pertenecen a la Fase 5.
+- En local el correo sale por Mailpit + WP Mail SMTP: verificá la bandeja en `http://127.0.0.1:8025`. Si `wp_mail` falla, revisá que Mailpit esté corriendo y que WP Mail SMTP siga apuntando a `127.0.0.1:1025`. Los emails de la Fase 5 todavía no están implementados; la matriz está en `docs/EMAILS.md`.
 - Antes de editar o commitear, mirá `git status`: el árbol puede tener trabajo del usuario (por ejemplo, fotos subidas o cambios en `inc/template-tags.php`). No lo pises ni lo incluyas en un commit sin confirmación; usá `git add` selectivo. La copia anidada `glowup-turnos/` es un repo del plugin sin trackear: no la edites, borres ni commitees.
 - Commits atómicos. Convención: `feat(theme): ...`, `fix(theme): ...`, `docs: ...`; en el plugin, `feat(booking): ...` / `fix(booking): ...`. No hagas push sin confirmación del usuario.

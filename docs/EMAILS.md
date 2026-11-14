@@ -19,13 +19,15 @@ Este documento fija las decisiones de la Fase 5 para que la implementación arra
 | Base de Mailpit | `C:\xampp\mailpit\mailpit.db` |
 | Conector de WordPress | WP Mail SMTP `4.10.4`, mailer “Other SMTP” |
 | Remitente | `GlowUp <no-reply@glowup.local>` |
-| Respuestas | `Reply-To: hola@glowup.local` (valor de `notification_email`) |
+| Respuestas | `Reply-To: hola@glowup.local` (valor de `notification_email`; lo agrega el plugin al armar cada email en la Fase 5) |
 
 Verificado el 14 de noviembre de 2026:
 
 - `wp_mail()` devuelve `true` y el mensaje aparece en Mailpit.
 - Un email real de WooCommerce (`WC_Email_Customer_Processing_Order`) llega a la bandeja con el remitente configurado.
 - Los emails ya no fallan con “No se pudo establecer la función de correo”.
+
+> El transporte local fija el remitente, pero todavía no el `Reply-To`: WP Mail SMTP no lo configura y el plugin lo hará por email recién en la Fase 5.
 
 ### Arranque
 

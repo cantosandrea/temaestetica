@@ -1,6 +1,6 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.6.0
+**Versión:** 0.6.1
 **Actualizado:** 14 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
@@ -54,6 +54,7 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | Base de datos | MariaDB 10.4.32, puerto 3307 |
 | Servidor local | XAMPP en Windows |
 | WooCommerce | 11.3.0 |
+| Correo local | Mailpit 1.33.1 + WP Mail SMTP 4.10.4 (SMTP `127.0.0.1:1025`, bandeja `http://127.0.0.1:8025`) |
 | Mercado Pago | Plugin oficial 8.10.0, activo en modo test/sandbox |
 | Tema | `temaestetica` 0.2.0, marca GlowUp |
 | Plugin de reservas | `glowup-turnos` 0.4.0, DB 1.1.0 |
@@ -333,7 +334,7 @@ El turno es la fuente de verdad del servicio, la profesional y el precio congela
 10. Si la orden se cancela o se reembolsa, el turno pasa a `cancelled`.
 11. Si el pago no se acredita antes del vencimiento, el cron marca el turno como `expired` y cancela la orden `pending` o `failed`.
 12. Si el pago llega después del vencimiento, se confirma solo cuando el horario sigue libre y el turno es futuro; en caso contrario, el turno queda `expired` o en su estado previo y la orden se marca con `_glowup_payment_review=yes` para revisión manual.
-13. Los emails de confirmación siguen pendientes para la Fase 5.
+13. Los emails de la Fase 5 están definidos en `docs/EMAILS.md`; la implementación sigue pendiente. El transporte local ya está resuelto con Mailpit y WP Mail SMTP.
 
 ### 6.3 Máquina de estados
 
@@ -514,13 +515,14 @@ Las mutaciones deben usar nonce, verificar sesión y capacidad, validar propieda
 
 ## 10. Emails y recordatorios
 
-- Confirmación al acreditarse el pago.
-- Aviso de cancelación y de reprogramación.
-- Recordatorio 24 h antes.
-- Recordatorio 2 h antes.
-- Copia interna al email configurado en ajustes.
-- Envío con `wp_mail`; en producción se recomienda SMTP transaccional con SPF y DKIM.
-- Los recordatorios se disparan por cron y deben registrar si ya se enviaron para evitar duplicados.
+La matriz completa, los destinatarios, los disparadores, la idempotencia y el plan de pruebas viven en `docs/EMAILS.md`. Resumen:
+
+- El plugin `glowup-turnos` es dueño de los emails de reserva; los emails genéricos de WooCommerce se suprimen para órdenes de reserva y siguen activos para cuentas y para la tienda futura.
+- Emails a la clienta: reserva creada, turno confirmado, pago rechazado, turno cancelado, turno reembolsado, reserva vencida, reprogramación y recordatorios de 24 h y 2 h.
+- Copia interna a `notification_email` para reserva nueva, pago a revisar y cancelación/reembolso.
+- Envío con `wp_mail` y plantillas HTML + texto plano, con la paleta y la tipografía de la marca.
+- Los recordatorios se disparan por un cron cada 15 minutos y registran cada envío en `wp_glowup_email_log` para no duplicar.
+- El transporte local es Mailpit (`127.0.0.1:1025`, bandeja en `http://127.0.0.1:8025`) con WP Mail SMTP; en producción se recomienda SMTP transaccional con SPF y DKIM.
 
 WhatsApp está fuera del alcance por decisión del proyecto.
 
@@ -591,7 +593,7 @@ chore: ...
 - Wizard público, cuenta, creación de orden y núcleo de pagos: Fases 3 y 4 implementadas.
 - Cancelación y reprogramación desde la cuenta de la clienta: pendiente antes del lanzamiento. La cancelación/reembolso desde WooCommerce ya se refleja en el turno.
 - Mercado Pago en sandbox: circuito cerrado con webhooks reales, pagos pendientes/rechazados/aprobados y reembolso completo. La producción queda fuera de alcance por ahora.
-- Los emails del flujo de pago (pedido, pago aprobado, reembolso) no se envían en local porque `wp_mail` falla; dependen de la Fase 5 y de un transporte SMTP o Mailpit/MailHog.
+- Los emails del flujo de pago y los recordatorios están definidos en `docs/EMAILS.md`; el transporte local (Mailpit + WP Mail SMTP) ya funciona, pero falta implementar la matriz y el cron de recordatorios en la Fase 5.
 - Emails reales y recordatorios: Fase 5.
 - CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
 - Agenda operativa con vista diaria/semanal: Fase 6.

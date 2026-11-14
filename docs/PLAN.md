@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.6.0
+**Versión:** 0.6.1
 **Actualizado:** 14 de noviembre de 2026
-**Estado:** Fase 4 completada en sandbox. El checkout de Mercado Pago confirma el turno automáticamente; los pagos pendientes, rechazados y aprobados se probaron con notificaciones reales enviadas por Mercado Pago a través de ngrok, y el reembolso completo desde WooCommerce dejó el pedido como `refunded` y el turno como `cancelled`. La conciliación de holds vencidos también está verificada con el cron real. La producción, el hosting y el cobro real quedan fuera de alcance porque el proyecto se mantiene como práctica local. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Estado:** Fase 4 completada en sandbox. Los prerrequisitos de la Fase 5 quedaron resueltos: Mailpit + WP Mail SMTP funcionando y la matriz de emails y recordatorios definida en `docs/EMAILS.md`. La implementación de los emails sigue pendiente. El checkout de Mercado Pago confirma el turno automáticamente; los pagos pendientes, rechazados y aprobados se probaron con notificaciones reales enviadas por Mercado Pago a través de ngrok, y el reembolso completo desde WooCommerce dejó el pedido como `refunded` y el turno como `cancelled`. La conciliación de holds vencidos también está verificada con el cron real. La producción, el hosting y el cobro real quedan fuera de alcance porque el proyecto se mantiene como práctica local. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -129,7 +129,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
 | 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
 | 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | Completada en sandbox: checkout, webhooks reales, pagos pendientes/rechazados/aprobados, reembolso completo y conciliación verificados. Producción fuera de alcance |
-| 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
+| 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente de implementación: prerrequisitos resueltos (Mailpit + WP Mail SMTP y matriz en `docs/EMAILS.md`) |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
 | 8. Tienda online | Tienda pública completa: catálogo, carrito, checkout, envíos y gift cards | Futura |
@@ -172,6 +172,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Fase 4 (webhook real): Mercado Pago envió notificaciones reales por ngrok con `source_news=webhooks`. Un pago pendiente dejó la orden en `pending` y el turno en `pending`; uno rechazado dejó la orden en `failed` y el turno en `pending`; uno aprobado dejó la orden en `processing` y el turno en `confirmed`. La notificación repetida no duplicó la confirmación.
 - Fase 4 (reembolso): el reembolso completo desde WooCommerce dejó el pedido en `refunded` y el turno en `cancelled`, con la nota de liberación correspondiente.
 - Los fixtures de las pruebas de Fase 4 se eliminaron al cierre. Los pedidos #103 y #104 quedan como evidencia histórica de la conciliación y del pago aprobado.
+- Prerrequisitos de Fase 5: Mailpit `1.33.1` escuchando en `127.0.0.1:1025` con bandeja en `http://127.0.0.1:8025`, WP Mail SMTP `4.10.4` configurado contra ese SMTP y `wp_mail()` verificado. También se verificó un email real de WooCommerce. La matriz de emails y recordatorios quedó definida en `docs/EMAILS.md`.
 - Errores verificados: horario ocupado (409), retención vencida (409), sesión vencida (403) y doble envío de orden (reutilización idempotente).
 - Accesibilidad 100 y Best Practices 100 en Lighthouse; sin desbordes horizontales en la verificación responsive.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
@@ -181,7 +182,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ### Próximo paso
 
-- Fase 5: configurar un transporte de correo local (SMTP o Mailpit/MailHog), definir la matriz de emails transaccionales y los recordatorios de 24 h y 2 h con idempotencia. La Fase 4 quedó cerrada en sandbox; la producción sigue fuera de alcance.
+- Fase 5: implementar la matriz de `docs/EMAILS.md` (emails transaccionales y recordatorios de 24 h y 2 h con idempotencia). El transporte local ya está resuelto y verificado. La Fase 4 quedó cerrada en sandbox; la producción sigue fuera de alcance.
 
 ### Pendientes funcionales
 
@@ -255,3 +256,4 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2026-11-12 | Cierre de Fase 3: wizard público, registro e ingreso, disponibilidad, retención, orden de WooCommerce asociada y resumen previo al pago. Plugin 0.3.0 y tema 0.2.0. La Fase 4 queda como siguiente paso, bloqueada por credenciales de Mercado Pago. |
 | 2026-11-13 | Fase 4 (núcleo): guarda de pago, confirmación al acreditarse, cancelación/reembolso, conciliación de holds vencidos y revisión manual de pagos tardíos. Plugin 0.4.0. El tema adapta la UI de pago según la pasarela disponible. Activación de Mercado Pago pendiente de credenciales. |
 | 2026-11-14 | Cierre de Fase 4 en sandbox: pago aprobado con confirmación automática, sincronización de la facturación con la cuenta de la clienta, cron de limpieza asegurado al arrancar, conciliación real (turno `expired` + pedido `cancelled`), notificaciones reales de Mercado Pago por ngrok para pagos pendientes, rechazados y aprobados, y reembolso completo con turno `cancelled`. La producción queda fuera de alcance por ahora. |
+| 2026-11-14 | Prerrequisitos de Fase 5: Mailpit + WP Mail SMTP configurados y verificados; matriz de emails y recordatorios definida en `docs/EMAILS.md`. La implementación de la Fase 5 queda como próximo paso. |

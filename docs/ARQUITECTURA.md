@@ -1,7 +1,7 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.5.0
-**Actualizado:** 13 de noviembre de 2026
+**Versión:** 0.6.0
+**Actualizado:** 14 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
 ---
@@ -29,7 +29,7 @@
 │                           └───────────────────┬──────────────────┘  │
 │                                               │                     │
 │                           ┌───────────────────▼──────────────────┐  │
-│                           │ Mercado Pago 8.10.0 (inactivo)       │  │
+│                           │ Mercado Pago 8.10.0 (modo test)      │  │
 │                           │ Checkout · Webhooks · Reembolsos     │  │
 │                           └──────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────┘
@@ -41,7 +41,7 @@ El sitio se apoya en tres capas:
 - **Negocio:** plugin `glowup-turnos`, dueño de la agenda, la disponibilidad, las políticas y la persistencia de turnos.
 - **Comercio:** WooCommerce para cuentas, órdenes, pagos y checkout de reservas; Mercado Pago como pasarela prevista. La tienda pública de productos está pausada durante el MVP y se abre en la Fase 8.
 
-La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper las cuentas ni los pedidos. El tema degrada a contenido de ejemplo si el plugin no está presente. La pausa de la tienda es solo de la vidriera pública de productos: las cuentas y los pedidos siguen operativos. La pantalla `order-pay` de una orden de reserva ya se exceptúa de la pausa y el núcleo de pagos de la Fase 4 está implementado; el cobro real se habilita cuando Mercado Pago tenga credenciales.
+La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper las cuentas ni los pedidos. El tema degrada a contenido de ejemplo si el plugin no está presente. La pausa de la tienda es solo de la vidriera pública de productos: las cuentas y los pedidos siguen operativos. La pantalla `order-pay` de una orden de reserva ya se exceptúa de la pausa y el circuito de pagos de la Fase 4 está cerrado en sandbox; Mercado Pago está configurado en modo test y la producción queda fuera de alcance.
 
 ---
 
@@ -54,7 +54,7 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | Base de datos | MariaDB 10.4.32, puerto 3307 |
 | Servidor local | XAMPP en Windows |
 | WooCommerce | 11.3.0 |
-| Mercado Pago | Plugin oficial 8.10.0, inactivo |
+| Mercado Pago | Plugin oficial 8.10.0, activo en modo test/sandbox |
 | Tema | `temaestetica` 0.2.0, marca GlowUp |
 | Plugin de reservas | `glowup-turnos` 0.4.0, DB 1.1.0 |
 | Prefijo de tablas | `wp_` |
@@ -155,7 +155,7 @@ La tienda pública es la Fase 8. Mientras el MVP no la abra, `inc/woocommerce.ph
 - `/mi-cuenta/` no se interviene: las cuentas siguen disponibles para reservar y consultar turnos.
 - La pantalla `order-pay` de una orden de reserva se excluye de `glowup_store_is_public_page()`. Sin pasarela configurada muestra un aviso, reemplaza el botón de pago por un enlace a Mi cuenta y oculta el checkbox de términos que ya se aceptó en el wizard. Con una pasarela disponible muestra el tiempo restante de la retención y deja el botón real de pago.
 - Si la retención venció, `before_woocommerce_pay` redirige a `/turnos/?glowup_pay=expired` para mostrar un aviso claro en lugar del error genérico de WooCommerce. La guarda del plugin sigue bloqueando el pago del lado del servidor.
-- El cobro real de esa pantalla se habilita cuando Mercado Pago esté configurado; el núcleo de Fase 4 ya está implementado y probado sin credenciales.
+- Esa pantalla usa la pasarela de Mercado Pago en modo test. El circuito de pago de la Fase 4 está verificado en sandbox; el cobro real y la producción quedan fuera de alcance.
 
 ---
 
@@ -415,6 +415,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - El cobro es total al reservar. La configuración `deposit` existe pero no se usa en el MVP.
 - Mercado Pago se integra con el plugin oficial, que gestiona checkout, webhooks y reembolsos.
 - Los reembolsos se inician desde WooCommerce y se reflejan en el estado del turno.
+- Las notificaciones de Mercado Pago entran por `/?wc-api=WC_WooMercadoPago_Basic_Gateway`. Para que el plugin oficial las rutee a `WebhookNotification` (consulta del pago real contra la API) la URL debe incluir `source_news=webhooks`; sin ese parámetro cae en `CoreNotification` y responde `400 Invalid notification id`. La URL se envía en el `notification_url` de cada pago, así que para probar webhooks hay que iniciar el checkout desde una URL pública (ngrok), no desde `localhost`.
 
 ### 7.2 Consideraciones
 
@@ -422,11 +423,16 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - El webhook debe ser idempotente: un mismo evento no puede confirmar dos veces ni duplicar emails. La confirmación del turno es idempotente porque solo actúa sobre turnos `pending`.
 - El estado del pedido y el estado del turno se mapean explícitamente: pagado → `confirmed`, cancelado/reembolsado → `cancelled`, hold vencido → `expired`.
 - Una orden `pending` puede sobrevivir a su retención: el cron la cancela y el pago queda bloqueado. Si el pago llega después, se confirma solo con horario libre o se marca para revisión.
-- Mercado Pago 8.10.0 está activo en modo test con credenciales de sandbox. El checkout y la confirmación automática del turno ya se probaron con un pago aprobado.
+- Mercado Pago 8.10.0 está activo en modo test con credenciales de sandbox. El checkout, la confirmación automática, los pagos pendientes/rechazados y el reembolso completo ya se probaron contra la API real de Mercado Pago.
 - Las credenciales de producción están cargadas, pero la validación con la cuenta real queda fuera de alcance por ahora: el proyecto se mantiene como práctica local y no se publica.
 - Con la pasarela test disponible, `glowup_booking_payments_available()` devuelve `true` y el wizard/`order-pay` muestran el pago real.
 - No se deben commitear credenciales; se cargan en la configuración de WooCommerce o en constantes de `wp-config.php`.
-- Verificación de la Fase 4: 17 comprobaciones de WP-CLI sobre pago normal, guarda, conciliación, pagos tardíos con y sin horario libre, cancelación y reembolso; pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (sin pasarela y con pasarela simulada por filtro); un pago aprobado en sandbox que confirmó el turno automáticamente; la conciliación real del cron, que marcó un turno vencido como `expired` y canceló su pedido `pending`; y el endpoint de webhooks (`?wc-api=WC_WooMercadoPago_Basic_Gateway`) respondiendo 200 por ngrok a una notificación del pago sandbox, sin duplicar la confirmación. Falta probar un pago iniciado desde la URL pública para que la notificación la envíe Mercado Pago. Los datos de las 17 comprobaciones se eliminaron al cierre.
+- Verificación de la Fase 4: 17 comprobaciones de WP-CLI sobre pago normal, guarda, conciliación, pagos tardíos con y sin horario libre, cancelación y reembolso; pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (sin pasarela y con pasarela simulada por filtro); la conciliación real del cron, que marcó un turno vencido como `expired` y canceló su pedido `pending`; y cuatro notificaciones reales enviadas por Mercado Pago por ngrok con `source_news=webhooks`:
+  - Pago pendiente (Rapipago): pedido `pending`, turno `pending`.
+  - Pago rechazado: pedido `failed`, turno `pending`.
+  - Pago aprobado: pedido `processing`, turno `confirmed` automáticamente.
+  - Reembolso completo desde WooCommerce: pedido `refunded` con `16000` devueltos y turno `cancelled`, con la nota de liberación.
+- La notificación repetida del pago aprobado no duplicó la confirmación. Los fixtures de esta ronda (turnos, pedidos y reembolso) se eliminaron al cierre; los pedidos #103 y #104 quedan como evidencia histórica de la conciliación y del primer pago aprobado.
 
 ### 7.3 Productos y tienda futura
 
@@ -435,7 +441,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - Los productos no se exponen al público durante el MVP: tienda, fichas, carrito y checkout de productos muestran “Próximamente”.
 - La tienda pública completa, con retiro en el salón y envío nacional, es la Fase 8 y queda fuera del MVP.
 - El costo de envío definitivo y los textos legales de compra quedan pendientes para esa fase.
-- WooCommerce sigue siendo la infraestructura de cuentas y órdenes; la pausa no desactiva el motor de cuentas. El `order-pay` de reservas está exceptuado de la pausa y el cobro se habilita cuando Mercado Pago tenga credenciales.
+- WooCommerce sigue siendo la infraestructura de cuentas y órdenes; la pausa no desactiva el motor de cuentas. El `order-pay` de reservas está exceptuado de la pausa y cobra con Mercado Pago en modo test.
 
 ---
 
@@ -584,7 +590,8 @@ chore: ...
 
 - Wizard público, cuenta, creación de orden y núcleo de pagos: Fases 3 y 4 implementadas.
 - Cancelación y reprogramación desde la cuenta de la clienta: pendiente antes del lanzamiento. La cancelación/reembolso desde WooCommerce ya se refleja en el turno.
-- Mercado Pago en sandbox: webhooks, pagos rechazados/pendientes y reembolsos end-to-end. La producción queda fuera de alcance por ahora.
+- Mercado Pago en sandbox: circuito cerrado con webhooks reales, pagos pendientes/rechazados/aprobados y reembolso completo. La producción queda fuera de alcance por ahora.
+- Los emails del flujo de pago (pedido, pago aprobado, reembolso) no se envían en local porque `wp_mail` falla; dependen de la Fase 5 y de un transporte SMTP o Mailpit/MailHog.
 - Emails reales y recordatorios: Fase 5.
 - CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
 - Agenda operativa con vista diaria/semanal: Fase 6.

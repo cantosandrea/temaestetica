@@ -2,7 +2,7 @@
 
 **Versión:** 0.5.0
 **Actualizado:** 14 de noviembre de 2026
-**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: el checkout de Mercado Pago en sandbox funciona, confirma el turno automáticamente y la conciliación de holds vencidos ya se verificó con el cron real. Faltan webhooks, pagos rechazados/pendientes y reembolsos end-to-end; la validación en producción queda fuera de alcance por ahora porque el proyecto se mantiene como práctica local. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: el checkout de Mercado Pago en sandbox funciona, confirma el turno automáticamente, la conciliación de holds vencidos ya se verificó con el cron real y el endpoint de webhooks respondió por ngrok. Falta un pago iniciado desde la URL pública para validar la notificación enviada por Mercado Pago, además de pagos rechazados/pendientes y reembolsos end-to-end; la validación en producción queda fuera de alcance por ahora porque el proyecto se mantiene como práctica local. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -128,7 +128,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 1. Base técnica | Entorno local, backup, WooCommerce, tema, plugin base, contenido y tienda inicial | Completada |
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
 | 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
-| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | En curso: checkout sandbox, confirmación automática y conciliación verificados; faltan webhooks y reembolsos end-to-end; producción fuera de alcance |
+| 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | En curso: checkout sandbox, confirmación automática, conciliación y endpoint de webhooks verificados; falta la notificación real desde un pago iniciado en la URL pública, más rechazados/pendientes y reembolsos |
 | 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
 | 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
@@ -169,6 +169,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Fase 4 verificada con 17 comprobaciones de WP-CLI y pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (con y sin pasarela simulada), sin errores de PHP.
 - Fase 4 (sandbox): un pago aprobado con la cuenta de prueba confirmó el turno automáticamente y dejó la orden en `processing`.
 - Fase 4 (conciliación): el cron se programa al arrancar aunque el plugin ya estuviera activo; un turno con hold vencido pasó a `expired`, su pedido `pending` a `cancelled` y una segunda corrida no volvió a actuar.
+- Fase 4 (webhook): el endpoint `?wc-api=WC_WooMercadoPago_Basic_Gateway` respondió 200 a una notificación del pago sandbox por ngrok y no duplicó la confirmación. Falta que Mercado Pago envíe la notificación de un pago iniciado desde la URL pública.
 - Errores verificados: horario ocupado (409), retención vencida (409), sesión vencida (403) y doble envío de orden (reutilización idempotente).
 - Accesibilidad 100 y Best Practices 100 en Lighthouse; sin desbordes horizontales en la verificación responsive.
 - Página de inicio, Servicios, Nosotras, Contacto, Turnos, Tienda, categoría, producto, carrito, checkout y Mi cuenta verificadas sin errores de PHP. En Tienda, carrito y checkout se verificó el cartel de “Próximamente” para visitantes; las pantallas reales se revisaron con una cuenta con permisos de gestión.
@@ -178,12 +179,12 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 ### Próximo paso
 
-- Fase 4: validar webhooks, pagos rechazados/pendientes y reembolsos end-to-end en sandbox. La producción queda fuera de alcance por ahora. El checkout, la confirmación automática y la conciliación ya están verificados.
+- Fase 4: validar un pago iniciado desde la URL pública para que Mercado Pago envíe el webhook, además de pagos rechazados/pendientes y reembolsos end-to-end en sandbox. La producción queda fuera de alcance por ahora. El checkout, la confirmación automática, la conciliación y la alcanzabilidad del webhook ya están verificados.
 
 ### Pendientes funcionales
 
 - Cancelación y reprogramación desde la cuenta de la clienta. La cancelación y el reembolso ya se reflejan cuando se cancelan o reembolsan desde WooCommerce, pero falta la acción de la clienta. Deben resolverse antes del lanzamiento.
-- Validar webhooks, pagos rechazados/pendientes y reembolsos end-to-end en sandbox. La producción queda fuera de alcance por ahora.
+- Validar un pago iniciado desde la URL pública (webhook real de Mercado Pago), pagos rechazados/pendientes y reembolsos end-to-end en sandbox. La producción queda fuera de alcance por ahora.
 - Emails transaccionales y recordatorios de la Fase 5.
 - Agenda operativa completa y edición de horarios de la Fase 6.
 
@@ -253,4 +254,4 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2026-11-11 | Reorganización de fases: la tienda pública pasa a la Fase 8 (futura) y Post-MVP a la Fase 9. Durante el MVP, tienda, carrito y checkout de productos muestran “Próximamente”. WooCommerce sigue activo para cuentas y órdenes de reservas. |
 | 2026-11-12 | Cierre de Fase 3: wizard público, registro e ingreso, disponibilidad, retención, orden de WooCommerce asociada y resumen previo al pago. Plugin 0.3.0 y tema 0.2.0. La Fase 4 queda como siguiente paso, bloqueada por credenciales de Mercado Pago. |
 | 2026-11-13 | Fase 4 (núcleo): guarda de pago, confirmación al acreditarse, cancelación/reembolso, conciliación de holds vencidos y revisión manual de pagos tardíos. Plugin 0.4.0. El tema adapta la UI de pago según la pasarela disponible. Activación de Mercado Pago pendiente de credenciales. |
-| 2026-11-14 | Fase 4 (sandbox): pago aprobado con confirmación automática del turno, sincronización de la facturación con la cuenta de la clienta, cron de limpieza asegurado al arrancar y conciliación real verificada (turno `expired` + pedido `cancelled`). La producción queda fuera de alcance por ahora. |
+| 2026-11-14 | Fase 4 (sandbox): pago aprobado con confirmación automática del turno, sincronización de la facturación con la cuenta de la clienta, cron de limpieza asegurado al arrancar, conciliación real verificada (turno `expired` + pedido `cancelled`) y endpoint de webhooks probado por ngrok sin duplicar la confirmación. La producción queda fuera de alcance por ahora. |

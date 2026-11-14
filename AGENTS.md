@@ -6,11 +6,11 @@
 - Es un tema clásico con `theme.json`, no un block theme: no agregues `templates/*.html` ni `parts/`.
 - Versiones de referencia: tema `0.2.0`, plugin `0.4.0`, esquema `1.1.0`, docs `0.5.0`.
 - La lógica de reservas vive en el plugin hermano `C:\xampp\htdocs\esteticaweb\wp-content\plugins\glowup-turnos` (repo Git separado). El tema solo consume sus repositorios y su REST; no pongas reglas de agenda acá.
-- Fase 3 cerrada: `/turnos/` tiene wizard público de servicios, profesional, fecha/hora, retención y orden. Fase 4 (pagos) tiene el núcleo implementado: guarda de pago, confirmación al acreditarse, cancelación/reembolso, conciliación de holds y revisión de pagos tardíos.
-- Mercado Pago `8.10.0` está instalado, inactivo y sin credenciales. No actives la pasarela, no cargues claves ni prometas cobro online sin pedido explícito; sin pasarela el wizard funciona y `order-pay` avisa que el pago online se habilita más adelante.
+- Fase 3 cerrada: `/turnos/` tiene wizard público de servicios, profesional, fecha/hora, retención y orden. Fase 4 (pagos) tiene el núcleo implementado y un pago sandbox aprobado que confirmó el turno automáticamente; faltan webhooks, pagos rechazados/pendientes, reembolsos, conciliación y producción end-to-end.
+- Mercado Pago `8.10.0` está activo en modo test/sandbox (`woo-mercado-pago-basic`). Las credenciales de producción están cargadas pero sin validar: no prometas cobro real, no expongas ni commitees claves y no cambies de modo sin pedido explícito. Sin pasarela disponible, el wizard y `order-pay` muestran el aviso de pago futuro.
 - Negocio: La Rioja capital; depilación **solo definitiva** (axilas, bozo, cavado, piernas, brazos y bikini, más un pack completo, todos con evaluación previa). No reintroduzcas servicios de cera. Precios ARS con IVA incluido; pago total al reservar; cancelación con reembolso hasta 24 h antes; reprogramación hasta 12 h antes; recordatorios solo por email (sin WhatsApp). Gift card simple incluida; packs/bonos completos y facturación fiscal quedan para post-MVP.
 - Desarrollo local en `http://localhost/esteticaweb`; WordPress 7.1.4, PHP 8.2.12, MariaDB en `localhost:3307`.
-- Acceso externo por ngrok: `wp-config.php` (fuera de los repos) define `WP_HOME`/`WP_SITEURL` dinámicos según `HTTP_HOST` y `X-Forwarded-Proto`. No hardcodees `localhost` en URLs nuevas y no toques ese bloque sin probar localhost y ngrok. `wp option get home` sigue mostrando localhost: es esperado, las constantes mandan en requests web.
+- Acceso externo por ngrok: `wp-config.php` (fuera de los repos) define `WP_HOME`/`WP_SITEURL` dinámicos según `HTTP_HOST` y `X-Forwarded-Proto`. No hardcodees `localhost` en URLs nuevas y no toques ese bloque sin probar localhost y ngrok. `wp option get home` sigue mostrando localhost: es esperado, las constantes mandan en requests web. Mercado Pago no puede notificar a `localhost`: para probar webhooks iniciá el checkout desde la URL de ngrok vigente.
 
 ## Comandos
 
@@ -21,7 +21,7 @@
 - Lint de todo el tema (PowerShell, sin la copia anidada): `Get-ChildItem -Recurse -Filter *.php | Where-Object { $_.FullName -notlike '*\glowup-turnos\*' } | ForEach-Object { C:\xampp\php\php.exe -l $_.FullName }`
 - Lint del plugin: el mismo comando dentro de `C:\xampp\htdocs\esteticaweb\wp-content\plugins\glowup-turnos`.
 - WP-CLI: `C:\xampp\php\php.exe C:\xampp\wp-cli\wp-cli.phar --path=C:\xampp\htdocs\esteticaweb <comando>`
-- Para datos/opciones o smoke tests, usá `wp eval-file archivo.php`; evita `wp eval` con comillas anidadas en PowerShell.
+- Para datos/opciones o smoke tests, usá `wp eval-file archivo.php`; evita `wp eval` con comillas anidadas en PowerShell. No hay WC-CLI completo (`wp wc` no expone `order`): para pedidos usá `wc_get_order()`/`wc_get_order_notes()` dentro de `eval-file`.
 
 No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sirven directo: editá `assets/css/main.css`, `assets/js/main.js` y `assets/js/booking.js`; no busques un paso de build.
 
@@ -36,7 +36,7 @@ No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sir
 - Los colores y las fuentes están duplicados en `theme.json`, `assets/css/main.css` y `assets/css/editor.css`. Si cambiás la paleta o la tipografía, actualizá los tres.
 - `inc/booking.php` concentra la integración del wizard: login/registro, orden desde `order-pay` y `glowup_booking_payments_available()`. La disponibilidad de cobro sale de gateways `woo-mercado-pago*`, no de un flag fijo.
 - `assets/js/booking.js` es el wizard sin dependencias. `paymentAvailable` llega por `wp_localize_script` como booleano JSON: el JS usa truthiness, no lo compares contra strings.
-- La integración con WooCommerce está en `inc/woocommerce.php`; no hay carpeta de overrides `woocommerce/`. Ahí viven la excepción de `order-pay` a la pausa de la tienda, el aviso de hold/pago, el redirect de hold vencido y el botón de pago condicionado. El badge del carrito sincroniza fragmentos AJAX y el Store API de bloques: si tocás el carrito, verificá ambos caminos.
+- La integración con WooCommerce está en `inc/woocommerce.php`; no hay carpeta de overrides `woocommerce/`. Ahí viven la excepción de `order-pay` a la pausa de la tienda (el resto del catálogo, carrito y checkout muestra `coming-soon.php`), el aviso de hold/pago, el redirect de hold vencido y el botón de pago condicionado. El badge del carrito sincroniza fragmentos AJAX y el Store API de bloques: si tocás el carrito, verificá ambos caminos.
 - Usá el prefijo `glowup_` para funciones y helpers nuevos. El copy va en español rioplatense.
 
 ## Reservas (plugin)
@@ -45,13 +45,17 @@ No hay `package.json`, Composer, bundler ni suite de tests/CI. Los assets se sir
 - La zona horaria de reservas es `America/Argentina/La_Rioja` y sale de `Settings::get('timezone')`; para fechas usá `Time`/esa configuración, no `wp_timezone()` ni la zona default de PHP.
 - La agenda operativa está en `wp-admin/admin.php?page=glowup-turnos-agenda`. Los bloqueos descuentan disponibilidad pero no cancelan turnos existentes; hay que reprogramar o cancelar a mano.
 - La concurrencia de holds se resuelve con `GET_LOCK` por profesional, transacción y consulta de solapamiento; no la reemplaces por un índice único. Los holds duran 15 minutos por defecto (`hold_minutes`) y los vencidos se conservan como `expired`.
-- `includes/class-booking-payments.php` engancha los estados de pago de WooCommerce (`woocommerce_order_payment_status_changed`, `woocommerce_order_status_changed`, `_cancelled`, `_refunded`, `woocommerce_order_needs_payment`). Un pago tardío solo confirma si el horario sigue libre y futuro; si no, deja el turno `expired`/revisión manual y marca `_glowup_payment_review=yes`. El cron `glowup_turnos_cleanup_holds` vence holds y cancela órdenes `pending`/`failed` asociadas.
+- `includes/class-booking-payments.php` engancha los estados de pago de WooCommerce (`woocommerce_order_payment_status_changed`, `woocommerce_order_status_changed`, `_cancelled`, `_refunded`, `woocommerce_order_needs_payment`) y `woocommerce_before_pay_action`, que resincroniza email/nombre/apellido de la orden desde la cuenta de la clienta antes de que la pasarela arme el pago. Un pago tardío solo confirma si el horario sigue libre y futuro; si no, deja el turno `expired`/revisión manual y marca `_glowup_payment_review=yes`.
+- La identidad de facturación sale de `user_email`, `first_name` y `last_name` del usuario WP, con los meta `billing_*` como respaldo. No vuelvas a priorizar solo `billing_*`: la orden es una copia y puede quedar vieja.
+- La orden usa el producto virtual oculto `Turno GlowUp` (SKU `glowup-turno`) porque Mercado Pago necesita un `WC_Product` real; no uses `product_id = 0`.
+- El cron `glowup_turnos_cleanup_holds` vence holds y cancela órdenes `pending`/`failed` asociadas, pero se programa solo en `Activator::activate()`; `maybe_upgrade()` no lo agenda. La disponibilidad ya ignora holds vencidos, pero sin cron la orden queda `pending`: verificá `wp_next_scheduled('glowup_turnos_cleanup_holds')` tras actualizar el plugin.
 - Cualquier cambio de reservas va al repo del plugin y se commitea por separado; ese repo no tiene remoto Git configurado, no intentes push. El tema solo consume la API.
 
 ## Documentación y verificación
 
 - `docs/PLAN.md` y `docs/ARQUITECTURA.md` (en español) son la referencia de alcance, modelo de datos y fases. Mantenelos sincronizados con el código; `docs/GlowUp-Proyecto.docx` es la versión formal (binaria: no la edites a mano).
-- La documentación de fases puede quedar desfasada (por ejemplo, `PLAN.md` aún dice “Fase 4 en curso” aunque el núcleo esté commiteado): contrastá siempre con `glowup-turnos.php`, `class-rest-api.php` y `class-booking-payments.php` antes de asumir un estado.
+- La documentación de fases puede quedar desfasada y el README del plugin quedó en `0.2.0`/Fase 2: contrastá siempre con `glowup-turnos.php`, `class-rest-api.php` y `class-booking-payments.php` antes de asumir un estado.
 - Antes de cerrar un cambio: `php -l` sobre los archivos tocados, `node --check` sobre el JS tocado, WP-CLI para datos/opciones y navegador para render, consola, enlaces y responsive. No hay tests automatizados.
+- En local `wp_mail` falla (“No se pudo establecer la función de correo”): los emails de pedido no llegan y eso no es un bug del flujo de reserva; pertenecen a la Fase 5.
 - Antes de editar o commitear, mirá `git status`: el árbol puede tener trabajo del usuario (por ejemplo, fotos subidas o cambios en `inc/template-tags.php`). No lo pises ni lo incluyas en un commit sin confirmación; usá `git add` selectivo. La copia anidada `glowup-turnos/` es un repo del plugin sin trackear: no la edites, borres ni commitees.
 - Commits atómicos. Convención: `feat(theme): ...`, `fix(theme): ...`, `docs: ...`; en el plugin, `feat(booking): ...` / `fix(booking): ...`. No hagas push sin confirmación del usuario.

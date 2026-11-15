@@ -1,8 +1,8 @@
 # GlowUp — Plan de proyecto
 
-**Versión:** 0.5.0
-**Actualizado:** 14 de noviembre de 2026
-**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: el checkout de Mercado Pago en sandbox funciona, confirma el turno automáticamente, la conciliación de holds vencidos ya se verificó con el cron real y el endpoint de webhooks respondió por ngrok. Falta un pago iniciado desde la URL pública para validar la notificación enviada por Mercado Pago, además de pagos rechazados/pendientes y reembolsos end-to-end; la validación en producción queda fuera de alcance por ahora porque el proyecto se mantiene como práctica local. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
+**Versión:** 0.7.0
+**Actualizado:** 15 de noviembre de 2026
+**Estado:** Fase 3 completada. Fase 4 (pagos) en curso: el checkout de Mercado Pago en sandbox funciona, confirma el turno automáticamente, la conciliación de holds vencidos ya se verificó con el cron real y el endpoint de webhooks respondió por ngrok. Falta un pago iniciado desde la URL pública para validar la notificación enviada por Mercado Pago, además de pagos rechazados/pendientes y reembolsos end-to-end; la validación en producción queda fuera de alcance por ahora porque el proyecto se mantiene como práctica local. La Fase 5 (emails) tiene una demo visual en `/turnos/`; el envío real sigue pendiente en el plugin. La Fase 6 (operación) se difiere porque la agenda interna pertenece al plugin `glowup-turnos`, que se desarrolla en otro equipo y no está disponible en este entorno; no altera el resultado del tema ni del flujo público de reservas. La tienda pública queda para la Fase 8 y durante el MVP muestra solo “Próximamente”.
 
 ---
 
@@ -89,7 +89,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Listado de servicios y profesionales.
 - Ajustes de reservas: retención, intervalo, anticipación, políticas, zona horaria, email y recordatorios.
 - Agenda operativa con bloqueos puntuales para vacaciones, feriados y ausencias.
-- Edición completa de horarios semanales y vista diaria/semanal en la Fase 6.
+- Edición completa de horarios semanales y vista diaria/semanal en la Fase 6, diferida en esta entrega porque el plugin no está disponible en este entorno.
 
 ---
 
@@ -129,8 +129,8 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2. Motor de agenda | Disponibilidad, excepciones, retenciones, prevención de solapamientos y persistencia | Completada |
 | 3. Wizard de reserva | Cuenta, selección de servicio/profesional/horario, retención y creación de orden | Completada |
 | 4. Pagos | Mercado Pago, webhooks, confirmación, reembolsos y conciliación | En curso: checkout sandbox, confirmación automática, conciliación y endpoint de webhooks verificados; falta la notificación real desde un pago iniciado en la URL pública, más rechazados/pendientes y reembolsos |
-| 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Pendiente |
-| 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Pendiente |
+| 5. Emails | Confirmación, cancelación, reprogramación y recordatorios 24 h / 2 h | Demo visual en `/turnos/`; el envío real sigue pendiente en el plugin |
+| 6. Operación | Agenda diaria, edición de horarios semanales, estados y notas | Diferida: pertenece al plugin `glowup-turnos`, desarrollado en otro equipo; no afecta el resultado del tema ni del flujo público |
 | 7. QA y lanzamiento | Pruebas integrales, accesibilidad, performance, legales y despliegue | Pendiente |
 | 8. Tienda online | Tienda pública completa: catálogo, carrito, checkout, envíos y gift cards | Futura |
 | 9. Post-MVP | Packs/bonos completos, facturación fiscal, mejoras de fidelización | Futura |
@@ -145,7 +145,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Backup de la base anterior en `C:\xampp\backups\esteticaweb\estetica_bd-20261108-230343.sql`.
 - WooCommerce 11.3.0 activo. Mercado Pago 8.10.0 activo en modo test/sandbox.
 - Configuración regional es_AR, moneda ARS, precios con IVA incluido, páginas legales y menús.
-- Tema GlowUp 0.2.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
+- Tema GlowUp 0.3.0 activo: plantillas, sistema de diseño, `theme.json`, estilos de editor, placeholders de imagen y favicon.
 - Plugin `glowup-turnos` 0.4.0 activo con esquema 1.1.0: tablas, roles, ajustes, repositorios, contenido inicial y panel de administración.
 - Motor de agenda de la Fase 2: disponibilidad por servicio, profesional y fecha; pausas, excepciones y anticipación mínima/máxima.
 - Retención de horarios durante 15 minutos con lock por profesional, transacción, idempotencia y prevención de solapamientos.
@@ -166,6 +166,7 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 - Fase 4 (núcleo): la conciliación de holds vencidos marca el turno como `expired` y cancela las órdenes de reserva `pending`/`failed` asociadas.
 - Fase 4 (núcleo): un pago tardío confirma el turno si el horario sigue libre y es futuro; si ya está ocupado o el turno fue cancelado, deja la orden marcada para revisión manual y reembolso.
 - Fase 4 (tema): los textos de pago, el CTA del wizard, el aviso de `order-pay` y el botón de pago se adaptan a si hay una pasarela de Mercado Pago disponible.
+- Fase 5 (demo visual): `/turnos/` muestra la confirmación, los recordatorios de 24 h y 2 h y el aviso de cambio de turno como tarjetas con vista previa modal. Usa datos de ejemplo y no envía correos.
 - Fase 4 verificada con 17 comprobaciones de WP-CLI y pruebas HTTP de `/turnos/` y `order-pay` en ambos estados (con y sin pasarela simulada), sin errores de PHP.
 - Fase 4 (sandbox): un pago aprobado con la cuenta de prueba confirmó el turno automáticamente y dejó la orden en `processing`.
 - Fase 4 (conciliación): el cron se programa al arrancar aunque el plugin ya estuviera activo; un turno con hold vencido pasó a `expired`, su pedido `pending` a `cancelled` y una segunda corrida no volvió a actuar.
@@ -185,8 +186,12 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 - Cancelación y reprogramación desde la cuenta de la clienta. La cancelación y el reembolso ya se reflejan cuando se cancelan o reembolsan desde WooCommerce, pero falta la acción de la clienta. Deben resolverse antes del lanzamiento.
 - Validar un pago iniciado desde la URL pública (webhook real de Mercado Pago), pagos rechazados/pendientes y reembolsos end-to-end en sandbox. La producción queda fuera de alcance por ahora.
-- Emails transaccionales y recordatorios de la Fase 5.
-- Agenda operativa completa y edición de horarios de la Fase 6.
+- Envío real de los emails transaccionales y recordatorios de la Fase 5 (plantillas, cron, prevención de duplicados y SMTP). El tema ya muestra una demo visual en `/turnos/`.
+- Fase 6 (operación), diferida por entorno: agenda diaria/semanal, horarios, estados, notas y CRUD completo de servicios y profesionales.
+
+### Diferido
+
+- La Fase 6 no se implementa en esta entrega porque el plugin `glowup-turnos` —dueño de la agenda— se desarrolla en otro equipo y no está disponible en este entorno. La decisión no altera el resultado del tema ni del flujo público de reservas: la operación interna queda documentada como trabajo futuro y se retoma cuando el plugin esté accesible.
 
 ### Bloqueado o pendiente de terceros
 
@@ -236,8 +241,8 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 
 1. Validar webhooks, pagos rechazados/pendientes y reembolsos end-to-end en sandbox (Fase 4); la producción queda fuera de alcance.
 2. Definir e implementar cancelación y reprogramación desde la cuenta (antes del lanzamiento).
-3. Implementar emails transaccionales y recordatorios (Fase 5).
-4. Completar la agenda operativa del panel con vista diaria/semanal y edición de horarios (Fase 6).
+3. Implementar el envío real de emails transaccionales y recordatorios (Fase 5); la demo visual del tema ya está.
+4. Retomar la Fase 6 (agenda operativa y CRUD) cuando el plugin `glowup-turnos` esté disponible en el entorno; no forma parte de esta entrega.
 5. Reemplazar placeholders con fotos y cerrar textos legales.
 6. Ejecutar QA integral y preparar el despliegue a producción (Fase 7).
 7. Recién después del lanzamiento, abrir la tienda pública como Fase 8.
@@ -255,3 +260,5 @@ Alcance futuro de la Fase 8: categorías y fichas de producto, carrito y checkou
 | 2026-11-12 | Cierre de Fase 3: wizard público, registro e ingreso, disponibilidad, retención, orden de WooCommerce asociada y resumen previo al pago. Plugin 0.3.0 y tema 0.2.0. La Fase 4 queda como siguiente paso, bloqueada por credenciales de Mercado Pago. |
 | 2026-11-13 | Fase 4 (núcleo): guarda de pago, confirmación al acreditarse, cancelación/reembolso, conciliación de holds vencidos y revisión manual de pagos tardíos. Plugin 0.4.0. El tema adapta la UI de pago según la pasarela disponible. Activación de Mercado Pago pendiente de credenciales. |
 | 2026-11-14 | Fase 4 (sandbox): pago aprobado con confirmación automática del turno, sincronización de la facturación con la cuenta de la clienta, cron de limpieza asegurado al arrancar, conciliación real verificada (turno `expired` + pedido `cancelled`) y endpoint de webhooks probado por ngrok sin duplicar la confirmación. La producción queda fuera de alcance por ahora. |
+| 2026-11-15 | Fase 5 (demo visual): `/turnos/` muestra los cuatro emails de ejemplo (confirmación, recordatorios de 24 h y 2 h, cambio de turno) en tarjetas con vista previa modal. Tema 0.3.0. No envía correos: el envío real sigue pendiente en el plugin. |
+| 2026-11-15 | Fase 6 (operación) diferida: el plugin `glowup-turnos` se desarrolla en otro equipo y no está disponible en este entorno. La decisión no altera el resultado del tema ni del flujo público; la agenda operativa, los horarios, los estados/notas y el CRUD quedan como trabajo futuro. Docs 0.7.0. |

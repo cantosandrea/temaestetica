@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GLOWUP_VERSION', '0.2.0' );
+define( 'GLOWUP_VERSION', '0.3.0' );
 define( 'GLOWUP_DIR', get_template_directory() );
 define( 'GLOWUP_URI', get_template_directory_uri() );
 

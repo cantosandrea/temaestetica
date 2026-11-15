@@ -1,7 +1,7 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.5.0
-**Actualizado:** 13 de noviembre de 2026
+**Versión:** 0.7.0
+**Actualizado:** 15 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
 ---
@@ -55,7 +55,7 @@ La separación permite cambiar el tema sin perder reservas, y desactivar la agen
 | Servidor local | XAMPP en Windows |
 | WooCommerce | 11.3.0 |
 | Mercado Pago | Plugin oficial 8.10.0, inactivo |
-| Tema | `temaestetica` 0.2.0, marca GlowUp |
+| Tema | `temaestetica` 0.3.0, marca GlowUp |
 | Plugin de reservas | `glowup-turnos` 0.4.0, DB 1.1.0 |
 | Prefijo de tablas | `wp_` |
 | Moneda | ARS |
@@ -333,7 +333,7 @@ El turno es la fuente de verdad del servicio, la profesional y el precio congela
 10. Si la orden se cancela o se reembolsa, el turno pasa a `cancelled`.
 11. Si el pago no se acredita antes del vencimiento, el cron marca el turno como `expired` y cancela la orden `pending` o `failed`.
 12. Si el pago llega después del vencimiento, se confirma solo cuando el horario sigue libre y el turno es futuro; en caso contrario, el turno queda `expired` o en su estado previo y la orden se marca con `_glowup_payment_review=yes` para revisión manual.
-13. Los emails de confirmación siguen pendientes para la Fase 5.
+13. El envío real de los emails de confirmación sigue pendiente para la Fase 5; el tema ya muestra una demo visual.
 
 ### 6.3 Máquina de estados
 
@@ -508,6 +508,7 @@ Las mutaciones deben usar nonce, verificar sesión y capacidad, validar propieda
 
 ## 10. Emails y recordatorios
 
+- Demo visual en `/turnos/` (`#emails`): cuatro tarjetas con vista previa modal de la confirmación, los recordatorios de 24 h y 2 h y el cambio de turno. Usa datos de ejemplo, `<dialog>` nativo y no envía correo; el envío real pertenece al plugin.
 - Confirmación al acreditarse el pago.
 - Aviso de cancelación y de reprogramación.
 - Recordatorio 24 h antes.
@@ -585,9 +586,8 @@ chore: ...
 - Wizard público, cuenta, creación de orden y núcleo de pagos: Fases 3 y 4 implementadas.
 - Cancelación y reprogramación desde la cuenta de la clienta: pendiente antes del lanzamiento. La cancelación/reembolso desde WooCommerce ya se refleja en el turno.
 - Mercado Pago en sandbox: webhooks, pagos rechazados/pendientes y reembolsos end-to-end. La producción queda fuera de alcance por ahora.
-- Emails reales y recordatorios: Fase 5.
-- CRUD completo de servicios, profesionales, horarios y excepciones: Fase 6.
-- Agenda operativa con vista diaria/semanal: Fase 6.
+- Envío real de emails y recordatorios: Fase 5 (la demo visual ya está en `/turnos/`).
+- Fase 6 (CRUD de servicios y profesionales, horarios, agenda diaria/semanal, estados y notas): diferida porque el plugin `glowup-turnos` se desarrolla en otro equipo y no está disponible en este entorno. No afecta el resultado del tema ni del flujo público.
 - Apertura de la tienda pública completa: Fase 8.
 - Tests automatizados y CI: posterior al MVP.
 - Estilos finos del checkout por bloques y del email: posterior.

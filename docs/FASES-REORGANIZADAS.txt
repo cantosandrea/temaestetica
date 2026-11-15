@@ -16,8 +16,8 @@ Fase 1   Base técnica                          Completada
 Fase 2   Motor de agenda                       Completada
 Fase 3   Wizard de reserva y cuenta            Completada
 Fase 4   Pagos                                 En curso (núcleo implementado; activación bloqueada)
-Fase 5   Emails                                Pendiente
-Fase 6   Operación                             Pendiente
+Fase 5   Emails                                Demo visual (envío pendiente)
+Fase 6   Operación                             Diferida (plugin en otro equipo)
 Fase 7   QA y lanzamiento                      Pendiente
 Fase 8   Tienda online                         Futura (solo "Próximamente")
 Fase 9   Post-MVP                              Futura
@@ -176,7 +176,7 @@ checkout, webhooks y reembolsos probados en sandbox.
 FASE 5 — EMAILS
 ------------------------------------------------------------
 
-Estado: pendiente.
+Estado: demo visual en `/turnos/`; el envío real sigue pendiente en el plugin.
 
 Objetivo:
 Avisar a la clienta y al salón en cada cambio relevante del turno.
@@ -192,6 +192,11 @@ Alcance:
 - SPF y DKIM.
 - Prevención de envíos duplicados.
 
+Demo actual:
+El tema muestra los cuatro avisos con datos de ejemplo en `/turnos/`,
+en tarjetas con vista previa modal. No envía correos: la implementación
+real (plantillas, cron, duplicados y SMTP) corresponde al plugin.
+
 Dependencias:
 Fases 3 y 4 cerradas.
 
@@ -203,7 +208,10 @@ en spam en una prueba real.
 FASE 6 — OPERACIÓN
 ------------------------------------------------------------
 
-Estado: pendiente.
+Estado: diferida. El plugin `glowup-turnos`, dueño de la agenda, se
+desarrolla en otro equipo y no está disponible en este entorno. La
+decisión no altera el resultado del tema ni del flujo público de
+reservas; la operación interna queda como trabajo futuro.
 
 Objetivo:
 Dar al equipo una agenda cómoda para el día a día.
@@ -217,6 +225,11 @@ Alcance:
 - Cancelación y reprogramación manual.
 - Filtros por profesional y fecha.
 - Permisos para el rol `glowup_professional`.
+
+Nota de alcance:
+La fase se difiere completa (agenda, horarios, estados, notas, CRUD de
+servicios y profesionales y permisos). No se implementa una versión
+parcial en el tema porque la operación pertenece al plugin.
 
 Dependencias:
 Fases 3 y 4 cerradas.
@@ -348,7 +361,9 @@ Completado:
 - Fase 4 (núcleo): guarda de pago, confirmación, cancelación/reembolso,
   conciliación de holds vencidos y revisión manual de pagos tardíos.
 - WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
-- Tema GlowUp 0.2.0 y plugin `glowup-turnos` 0.4.0, esquema 1.1.0.
+- Tema GlowUp 0.3.0 y plugin `glowup-turnos` 0.4.0, esquema 1.1.0.
+- Fase 5 (demo visual): confirmación, recordatorios de 24 h y 2 h y
+  cambio de turno visibles en `/turnos/`, sin envío de correos.
 - 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
 - 18 productos cargados como catálogo interno.
 - API de disponibilidad, holds, órdenes y turnos.
@@ -368,15 +383,23 @@ Nota sobre la tienda:
   tienda pública completa es la Fase 8.
 
 Siguiente:
-- Fase 4: activar Mercado Pago en sandbox, cargar credenciales y probar
-  checkout, webhooks y reembolsos end-to-end.
+- Fase 4: validar un pago iniciado desde la URL pública, rechazados,
+  pendientes y reembolsos end-to-end en sandbox.
+- Fase 5: implementar el envío real de emails.
 
 Pendiente funcional:
 - Cancelación y reprogramación desde la cuenta de la clienta.
 - Emails transaccionales y recordatorios.
 
+Diferido:
+- Fase 6 (operación): agenda diaria/semanal, horarios semanales, estados,
+  notas, cancelación/reprogramación manual y CRUD completo de servicios y
+  profesionales. El plugin se desarrolla en otro equipo y no está en este
+  entorno; no afecta el resultado del tema ni del flujo público.
+
 Bloqueado:
-- Fase 4: activación de Mercado Pago y pruebas con credenciales.
+- Fase 4: validación de un pago iniciado desde la URL pública,
+  rechazados/pendientes y reembolsos end-to-end en sandbox.
 
 Pendiente de terceros:
 - Fotos y logo definitivos.
@@ -393,7 +416,8 @@ PRÓXIMOS PASOS
 2. Validar la conciliación de holds vencidos y pagos tardíos con la pasarela real.
 3. Definir e implementar cancelación y reprogramación desde la cuenta.
 4. Implementar emails transaccionales.
-5. Completar la agenda operativa del panel.
+5. Retomar la Fase 6 cuando el plugin esté disponible; no forma parte
+   de esta entrega.
 6. Ejecutar QA, cargar fotos y textos legales, y lanzar.
 7. Recién después, abrir la tienda online como Fase 8.
 

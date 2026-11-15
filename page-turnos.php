@@ -448,6 +448,7 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 						</p>
 						<p class="booking-summary__note"><?php esc_html_e( 'Precio final con impuestos incluidos.', 'temaestetica' ); ?></p>
 						<p class="booking-summary__note"><?php esc_html_e( 'Cancelación con reembolso hasta 24 h antes. Reprogramación hasta 12 h antes.', 'temaestetica' ); ?></p>
+						<p class="booking-summary__note"><?php esc_html_e( 'Te enviamos la confirmación y los recordatorios por email.', 'temaestetica' ); ?> <a class="booking-summary__link" href="#emails"><?php esc_html_e( 'Ver ejemplos', 'temaestetica' ); ?></a></p>
 					</aside>
 				</div>
 			<?php endif; ?>
@@ -518,6 +519,8 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 			</div>
 		</div>
 	</section>
+
+	<?php get_template_part( 'template-parts/section', 'emails' ); ?>
 
 	<?php get_template_part( 'template-parts/section', 'cta' ); ?>
 </main>

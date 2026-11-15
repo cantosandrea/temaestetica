@@ -448,7 +448,7 @@ if ( class_exists( 'GlowUp\\Turnos\\Settings' ) ) {
 						</p>
 						<p class="booking-summary__note"><?php esc_html_e( 'Precio final con impuestos incluidos.', 'temaestetica' ); ?></p>
 						<p class="booking-summary__note"><?php esc_html_e( 'Cancelación con reembolso hasta 24 h antes. Reprogramación hasta 12 h antes.', 'temaestetica' ); ?></p>
-						<p class="booking-summary__note"><?php esc_html_e( 'Te enviamos la confirmación y los recordatorios por email.', 'temaestetica' ); ?> <a class="booking-summary__link" href="#emails"><?php esc_html_e( 'Ver ejemplos', 'temaestetica' ); ?></a></p>
+						<p class="booking-summary__note"><?php esc_html_e( 'La confirmación y los recordatorios por email están en desarrollo.', 'temaestetica' ); ?> <a class="booking-summary__link" href="#emails"><?php esc_html_e( 'Ver ejemplos', 'temaestetica' ); ?></a></p>
 					</aside>
 				</div>
 			<?php endif; ?>

@@ -2,7 +2,7 @@
 GLOWUP — FASES REORGANIZADAS
 ============================================================
 
-Actualizado: 13 de noviembre de 2026
+Actualizado: 15 de noviembre de 2026
 Criterio: lanzar primero el sitio de marca y las reservas con pago.
 La tienda online pasa a una fase futura y, durante el MVP, solo
 muestra un cartel de "Próximamente".
@@ -15,7 +15,7 @@ Fase 0   Descubrimiento                        Completada
 Fase 1   Base técnica                          Completada
 Fase 2   Motor de agenda                       Completada
 Fase 3   Wizard de reserva y cuenta            Completada
-Fase 4   Pagos                                 En curso (núcleo implementado; activación bloqueada)
+Fase 4   Pagos                                 Completada en sandbox
 Fase 5   Emails                                Demo visual (envío pendiente)
 Fase 6   Operación                             Diferida (plugin en otro equipo)
 Fase 7   QA y lanzamiento                      Pendiente
@@ -136,8 +136,10 @@ orden queda pendiente de pago; el cobro se habilita en la Fase 4.
 FASE 4 — PAGOS
 ------------------------------------------------------------
 
-Estado: en curso. El núcleo de pagos está implementado; la activación de
-Mercado Pago y las pruebas end-to-end siguen bloqueadas por credenciales.
+Estado: completada en sandbox. El núcleo de pagos está implementado y
+verificado con webhooks reales, pagos pendientes/rechazados/aprobados,
+conciliación de holds vencidos y reembolso completo. La producción y el
+cobro real quedan fuera de alcance.
 
 Objetivo:
 Cobrar el total del turno al reservar y confirmar la reserva cuando
@@ -157,16 +159,16 @@ Alcance implementado:
 - UI del tema condicionada a la disponibilidad de una pasarela: textos,
   CTA del wizard, aviso y botón de `order-pay`.
 - Redirección clara cuando la retención venció antes de pagar.
+- Checkout sandbox aprobado y webhooks reales de Mercado Pago por ngrok.
+- Reembolso completo desde WooCommerce con pedido `refunded` y turno
+  `cancelled`.
 
-Alcance pendiente (bloqueado por credenciales):
-- Activar Mercado Pago en sandbox y cargar credenciales.
-- Probar checkout, webhooks, pago aprobado/rechazado/expirado y
-  reembolsos end-to-end.
-- Validar la conciliación con pagos reales de la pasarela.
+Alcance pendiente (fuera del alcance local):
+- Validar checkout, webhooks y reembolsos con credenciales de producción.
 - Reembolsos por cancelación dentro del plazo de 24 horas desde la cuenta.
 
 Dependencias:
-Fase 3 cerrada y credenciales de Mercado Pago disponibles.
+Fase 3 cerrada y Mercado Pago en modo test con credenciales de sandbox.
 
 Criterio de cierre:
 Un turno pagado queda confirmado y uno no pagado libera el horario, con
@@ -383,9 +385,7 @@ Nota sobre la tienda:
   tienda pública completa es la Fase 8.
 
 Siguiente:
-- Fase 4: validar un pago iniciado desde la URL pública, rechazados,
-  pendientes y reembolsos end-to-end en sandbox.
-- Fase 5: implementar el envío real de emails.
+- Fase 5: implementar el envío real de emails y recordatorios.
 
 Pendiente funcional:
 - Cancelación y reprogramación desde la cuenta de la clienta.
@@ -398,8 +398,8 @@ Diferido:
   entorno; no afecta el resultado del tema ni del flujo público.
 
 Bloqueado:
-- Fase 4: validación de un pago iniciado desde la URL pública,
-  rechazados/pendientes y reembolsos end-to-end en sandbox.
+- Fase 5: el envío real se implementa en el plugin `glowup-turnos`, que
+  no está disponible en este entorno.
 
 Pendiente de terceros:
 - Fotos y logo definitivos.
@@ -411,15 +411,15 @@ Pendiente de terceros:
 PRÓXIMOS PASOS
 ------------------------------------------------------------
 
-1. Activar Mercado Pago en sandbox cuando estén las credenciales y probar
-   checkout, webhooks y reembolsos end-to-end.
-2. Validar la conciliación de holds vencidos y pagos tardíos con la pasarela real.
-3. Definir e implementar cancelación y reprogramación desde la cuenta.
-4. Implementar emails transaccionales.
-5. Retomar la Fase 6 cuando el plugin esté disponible; no forma parte
+1. Implementar el envío real de emails transaccionales y recordatorios
+   (Fase 5) en el plugin `glowup-turnos`.
+2. Definir e implementar cancelación y reprogramación desde la cuenta
+   de la clienta.
+3. Retomar la Fase 6 cuando el plugin esté disponible; no forma parte
    de esta entrega.
-6. Ejecutar QA, cargar fotos y textos legales, y lanzar.
-7. Recién después, abrir la tienda online como Fase 8.
+4. Reemplazar placeholders con fotos y cerrar textos legales.
+5. Ejecutar QA integral y preparar el lanzamiento (Fase 7).
+6. Recién después, abrir la tienda online como Fase 8.
 
 ============================================================
 Fin del documento.

@@ -44,10 +44,10 @@ $glowup_email_examples = array(
 		<header class="section-head section-head--split">
 			<div>
 				<p class="kicker"><?php esc_html_e( 'Acompañamiento', 'temaestetica' ); ?></p>
-				<h2><?php esc_html_e( 'Tus turnos también llegan por email.', 'temaestetica' ); ?></h2>
+				<h2><?php esc_html_e( 'Así se verán los avisos de tus turnos.', 'temaestetica' ); ?></h2>
 			</div>
 			<div class="section-head__aside">
-				<p><?php esc_html_e( 'Te enviamos la confirmación y dos recordatorios antes del turno. Sin WhatsApp: solo email, al correo de tu cuenta.', 'temaestetica' ); ?></p>
+				<p><?php esc_html_e( 'Cuando el envío esté activo, vas a recibir la confirmación y dos recordatorios antes del turno. Sin WhatsApp: solo email, al correo de tu cuenta.', 'temaestetica' ); ?></p>
 				<p class="emails-demo__note"><?php esc_html_e( 'Ejemplos de los avisos que recibirías al reservar.', 'temaestetica' ); ?></p>
 			</div>
 		</header>

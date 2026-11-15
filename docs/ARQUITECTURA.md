@@ -1,6 +1,6 @@
 # GlowUp — Arquitectura
 
-**Versión:** 0.7.0
+**Versión:** 0.8.0
 **Actualizado:** 15 de noviembre de 2026
 **Ámbito:** WordPress local `http://localhost/esteticaweb`
 
@@ -25,7 +25,7 @@
 │              │            ┌───────────────────────▼──────────────┐  │
 │              │            │ WooCommerce 11.3.0                   │  │
 │              └───────────►│ Cuentas · Pedidos · Pagos            │  │
-│                           │ Tienda pública pausada (Fase 8)      │  │
+│                           │ Tienda pública pausada               │  │
 │                           └───────────────────┬──────────────────┘  │
 │                                               │                     │
 │                           ┌───────────────────▼──────────────────┐  │
@@ -39,7 +39,7 @@ El sitio se apoya en tres capas:
 
 - **Presentación:** tema `temaestetica`, que muestra la marca GlowUp y consume datos de servicios y profesionales cuando el plugin está activo.
 - **Negocio:** plugin `glowup-turnos`, dueño de la agenda, la disponibilidad, las políticas y la persistencia de turnos.
-- **Comercio:** WooCommerce para cuentas, órdenes, pagos y checkout de reservas; Mercado Pago como pasarela prevista. La tienda pública de productos está pausada durante el MVP y se abre en la Fase 8.
+- **Comercio:** WooCommerce para cuentas, órdenes, pagos y checkout de reservas; Mercado Pago como pasarela en modo test. La tienda pública de productos está pausada y queda fuera de alcance.
 
 La separación permite cambiar el tema sin perder reservas, y desactivar la agenda sin romper las cuentas ni los pedidos. El tema degrada a contenido de ejemplo si el plugin no está presente. La pausa de la tienda es solo de la vidriera pública de productos: las cuentas y los pedidos siguen operativos. La pantalla `order-pay` de una orden de reserva ya se exceptúa de la pausa y el circuito de pagos de la Fase 4 está cerrado en sandbox; Mercado Pago está configurado en modo test y la producción queda fuera de alcance.
 
@@ -146,7 +146,7 @@ La Fase 3 reemplazó el estado “próximamente” de `/turnos/` por el flujo p�
 
 ### 3.6 Pausa de la tienda pública
 
-La tienda pública es la Fase 8. Mientras el MVP no la abra, `inc/woocommerce.php` aplica una pausa de vidriera:
+La tienda pública queda fuera de alcance. Mientras esté pausada, `inc/woocommerce.php` aplica una pausa de vidriera:
 
 - `glowup_store_is_coming_soon()` devuelve `true` por defecto y se puede filtrar con `glowup_store_coming_soon`.
 - `glowup_store_is_public_page()` identifica tienda, ficha de producto, taxonomías de producto, carrito y checkout.
@@ -334,7 +334,7 @@ El turno es la fuente de verdad del servicio, la profesional y el precio congela
 10. Si la orden se cancela o se reembolsa, el turno pasa a `cancelled`.
 11. Si el pago no se acredita antes del vencimiento, el cron marca el turno como `expired` y cancela la orden `pending` o `failed`.
 12. Si el pago llega después del vencimiento, se confirma solo cuando el horario sigue libre y el turno es futuro; en caso contrario, el turno queda `expired` o en su estado previo y la orden se marca con `_glowup_payment_review=yes` para revisión manual.
-13. El envío real de los emails de confirmación sigue pendiente para la Fase 5; el tema ya muestra una demo visual y la matriz está definida en `docs/EMAILS.md`. El transporte local ya está resuelto con Mailpit y WP Mail SMTP.
+13. El envío real de los emails de confirmación queda fuera de alcance; el tema muestra una demo visual y la matriz se conserva como diseño en `docs/EMAILS.md`. El transporte local quedó verificado con Mailpit y WP Mail SMTP.
 
 ### 6.3 Máquina de estados
 
@@ -440,7 +440,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 - El catálogo interno tiene 18 productos simples en cinco categorías, con precios finales y IVA incluido.
 - Stock gestionado en productos físicos; gift card virtual sin stock.
 - Los productos no se exponen al público durante el MVP: tienda, fichas, carrito y checkout de productos muestran “Próximamente”.
-- La tienda pública completa, con retiro en el salón y envío nacional, es la Fase 8 y queda fuera del MVP.
+- La tienda pública completa, con retiro en el salón y envío nacional, queda fuera de alcance.
 - El costo de envío definitivo y los textos legales de compra quedan pendientes para esa fase.
 - WooCommerce sigue siendo la infraestructura de cuentas y órdenes; la pausa no desactiva el motor de cuentas. El `order-pay` de reservas está exceptuado de la pausa y cobra con Mercado Pago en modo test.
 
@@ -452,7 +452,7 @@ Salida: lista de horarios de inicio que permiten completar la duración del serv
 | --- | --- | --- |
 | `administrator` | Agustina / administración | Todas las capacidades GlowUp y WooCommerce |
 | `glowup_professional` | Estela / Agustina | Ver turnos, gestionar su agenda, subir archivos |
-| `customer` | Clientas | Reservar y ver sus turnos; comprar cuando la tienda abra en la Fase 8 |
+| `customer` | Clientas | Reservar y ver sus turnos |
 
 Capacidades propias:
 
@@ -515,7 +515,8 @@ Las mutaciones deben usar nonce, verificar sesión y capacidad, validar propieda
 
 ## 10. Emails y recordatorios
 
-- Demo visual en `/turnos/` (`#emails`): cuatro tarjetas con vista previa modal de la confirmación, los recordatorios de 24 h y 2 h y el cambio de turno. Usa datos de ejemplo, `<dialog>` nativo y no envía correo; el envío real pertenece al plugin.
+- Demo visual en `/turnos/` (`#emails`): cuatro tarjetas con vista previa modal de la confirmación, los recordatorios de 24 h y 2 h y el cambio de turno. Usa datos de ejemplo, `<dialog>` nativo y no envía correo. **El envío real queda fuera de alcance de la práctica.**
+- Esta sección y `docs/EMAILS.md` se conservan como diseño de referencia para una implementación futura en el plugin.
 - La matriz completa, los destinatarios, los disparadores, la idempotencia y el plan de pruebas viven en `docs/EMAILS.md`. Resumen:
   - El plugin `glowup-turnos` es dueño de los emails de reserva; los emails genéricos de WooCommerce se suprimen para órdenes de reserva y siguen activos para cuentas y para la tienda futura.
   - Emails a la clienta: reserva creada, turno confirmado, pago rechazado, turno cancelado, turno reembolsado, reserva vencida, reprogramación y recordatorios de 24 h y 2 h.
@@ -556,12 +557,11 @@ WhatsApp está fuera del alcance por decisión del proyecto.
 - Base: MariaDB en `127.0.0.1:3307`
 - Backups: `C:\xampp\backups\esteticaweb`
 
-### Futuro
+### Producción (fuera de alcance)
 
-- staging con copia de base y contenido.
-- Producción con HTTPS, caché, SMTP, backups automáticos y monitoreo.
-- Variables sensibles en `wp-config.php` o entorno, nunca en el repositorio.
-- Migración con plugin de migración o export/import controlado; nunca copiar la base local sin sanitizar.
+- La práctica no se despliega: no hay staging, hosting, dominio ni correo de producción.
+- Las variables sensibles viven en `wp-config.php` o entorno, nunca en el repositorio.
+- Si alguna vez se publicara, habría que sanitizar la base local y definir HTTPS, caché, backups y monitoreo.
 
 ---
 
@@ -591,15 +591,15 @@ chore: ...
 ## 14. Deuda técnica y decisiones pendientes
 
 - Wizard público, cuenta, creación de orden y núcleo de pagos: Fases 3 y 4 implementadas.
-- Cancelación y reprogramación desde la cuenta de la clienta: pendiente antes del lanzamiento. La cancelación/reembolso desde WooCommerce ya se refleja en el turno.
-- Mercado Pago en sandbox: circuito cerrado con webhooks reales, pagos pendientes/rechazados/aprobados y reembolso completo. La producción queda fuera de alcance por ahora.
-- Envío real de emails y recordatorios: Fase 5 (la demo visual ya está en `/turnos/`; la matriz y el transporte local están en `docs/EMAILS.md`).
-- Fase 6 (CRUD de servicios y profesionales, horarios, agenda diaria/semanal, estados y notas): diferida porque el plugin `glowup-turnos` se desarrolla en otro equipo y no está disponible en este entorno. No afecta el resultado del tema ni el flujo público.
-- Apertura de la tienda pública completa: Fase 8.
-- Tests automatizados y CI: posterior al MVP.
-- Estilos finos del checkout por bloques y del email: posterior.
-- Costos de envío, logística y dirección exacta: negocio, para la Fase 8.
-- Textos legales de compra, envío y devoluciones: Fase 8.
+- Mercado Pago en sandbox: circuito cerrado con webhooks reales, pagos pendientes/rechazados/aprobados y reembolso completo. La producción queda fuera de alcance.
+- Envío real de emails y recordatorios: demo visual cerrada en `/turnos/`; el envío real queda fuera de alcance. `docs/EMAILS.md` se conserva como diseño.
+- Fase 6 (CRUD de servicios y profesionales, horarios, agenda diaria/semanal, estados y notas): fuera de alcance porque el plugin `glowup-turnos` se desarrolla en otro equipo y no está disponible en este entorno.
+- Cancelación y reprogramación desde la cuenta de la clienta: fuera de alcance.
+- Tienda pública completa, envíos, gift card y devoluciones: fuera de alcance. Solo se conserva el cartel “Próximamente”.
+- Producción: hosting, dominio, correo, backups, monitoreo, rollback y cobro real, fuera de alcance.
+- QA formal, auditoría de accesibilidad/performance y revisión legal: fuera de alcance.
+- Tests automatizados y CI: fuera de alcance.
+- Estilos finos del checkout por bloques y del email: posteriores.
 - Textos legales definitivos y facturación: negocio/legal.
 - Fotos y logo definitivos: contenido.
 - Los turnos vencidos se conservan como `expired` para auditoría; revisar la política de retención de datos antes de producción.

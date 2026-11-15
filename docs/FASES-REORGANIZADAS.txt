@@ -3,9 +3,10 @@ GLOWUP — FASES REORGANIZADAS
 ============================================================
 
 Actualizado: 15 de noviembre de 2026
-Criterio: lanzar primero el sitio de marca y las reservas con pago.
-La tienda online pasa a una fase futura y, durante el MVP, solo
-muestra un cartel de "Próximamente".
+Criterio: proyecto de práctica universitaria. El alcance se limita al
+sitio de marca y al flujo de reservas con pago en sandbox. La tienda
+online, la operación interna, el envío real de emails y el despliegue
+quedan fuera de alcance.
 
 ------------------------------------------------------------
 RESUMEN
@@ -16,16 +17,13 @@ Fase 1   Base técnica                          Completada
 Fase 2   Motor de agenda                       Completada
 Fase 3   Wizard de reserva y cuenta            Completada
 Fase 4   Pagos                                 Completada en sandbox
-Fase 5   Emails                                Demo visual (envío pendiente)
-Fase 6   Operación                             Diferida (plugin en otro equipo)
-Fase 7   QA y lanzamiento                      Pendiente
-Fase 8   Tienda online                         Futura (solo "Próximamente")
-Fase 9   Post-MVP                              Futura
+Fase 5   Emails                                Demo visual cerrada (envío real fuera de alcance)
+Fase 6   Operación                             Fuera de alcance (plugin en otro equipo)
+Fase 7   Cierre de la práctica                 Pendiente
 
-La Fase 8 no se elimina: se conserva como fase futura. Lo que se
-reduce es su alcance dentro del MVP. La tienda completa no se
-implementa ni se abre al público hasta después de cerrar las
-Fases 3 a 7.
+Las antiguas fases 8 (tienda online) y 9 (post-MVP) se retiran del
+plan de la práctica. La tienda pública queda solo con el cartel
+"Próximamente" y no se implementa el comercio.
 
 ------------------------------------------------------------
 FASE 0 — DESCUBRIMIENTO
@@ -163,9 +161,9 @@ Alcance implementado:
 - Reembolso completo desde WooCommerce con pedido `refunded` y turno
   `cancelled`.
 
-Alcance pendiente (fuera del alcance local):
-- Validar checkout, webhooks y reembolsos con credenciales de producción.
-- Reembolsos por cancelación dentro del plazo de 24 horas desde la cuenta.
+Fuera de alcance:
+- Validación con credenciales de producción y cobro real.
+- Reembolsos por cancelación desde la cuenta de la clienta.
 
 Dependencias:
 Fase 3 cerrada y Mercado Pago en modo test con credenciales de sandbox.
@@ -175,50 +173,46 @@ Un turno pagado queda confirmado y uno no pagado libera el horario, con
 checkout, webhooks y reembolsos probados en sandbox.
 
 ------------------------------------------------------------
-FASE 5 — EMAILS
+FASE 5 — EMAILS (DEMO VISUAL)
 ------------------------------------------------------------
 
-Estado: demo visual en `/turnos/`; el envío real sigue pendiente en el plugin.
+Estado: cerrada como demo visual. El envío real queda fuera de alcance
+de la práctica.
 
 Objetivo:
-Avisar a la clienta y al salón en cada cambio relevante del turno.
+Mostrar cómo se verán los avisos de la reserva dentro del sitio.
 
-Alcance:
-- Confirmación de reserva.
-- Cancelación y reprogramación.
-- Recordatorio 24 horas antes.
-- Recordatorio 2 horas antes.
-- Copia interna al email del salón.
-- Plantillas con la identidad GlowUp.
-- Configuración SMTP para producción.
-- SPF y DKIM.
-- Prevención de envíos duplicados.
+Alcance implementado:
+- Cuatro tarjetas en `/turnos/`: confirmación, recordatorio de 24 h,
+  recordatorio de 2 h y cambio de turno.
+- Vista previa modal con datos de ejemplo.
+- Copy que aclara que el envío no está activo.
+- Sin integración con `wp_mail`, sin cron y sin SMTP.
 
-Demo actual:
-El tema muestra los cuatro avisos con datos de ejemplo en `/turnos/`,
-en tarjetas con vista previa modal. No envía correos: la implementación
-real (plantillas, cron, duplicados y SMTP) corresponde al plugin.
+Fuera de alcance:
+- Envío real, plantillas definitivas, recordatorios automáticos,
+  prevención de duplicados y SMTP/SPF/DKIM.
+- La implementación pertenece al plugin `glowup-turnos`, que no está
+  disponible en este entorno.
 
 Dependencias:
-Fases 3 y 4 cerradas.
+Ninguna adicional; la demo usa datos de ejemplo.
 
 Criterio de cierre:
-Los emails se envían una sola vez, con los datos correctos y sin caer
-en spam en una prueba real.
+La demo visual está integrada y no promete el envío real.
 
 ------------------------------------------------------------
-FASE 6 — OPERACIÓN
+FASE 6 — OPERACIÓN (FUERA DE ALCANCE)
 ------------------------------------------------------------
 
-Estado: diferida. El plugin `glowup-turnos`, dueño de la agenda, se
-desarrolla en otro equipo y no está disponible en este entorno. La
-decisión no altera el resultado del tema ni del flujo público de
-reservas; la operación interna queda como trabajo futuro.
+Estado: fuera de alcance. El plugin `glowup-turnos`, dueño de la agenda,
+se desarrolla en otro equipo y no está disponible en este entorno.
 
-Objetivo:
-Dar al equipo una agenda cómoda para el día a día.
+Motivo:
+La operación interna no forma parte del tema ni de la entrega de la
+práctica. No se implementa una versión parcial en el tema.
 
-Alcance:
+Alcance excluido:
 - Vista diaria y semanal de turnos.
 - Edición de horarios semanales por profesional.
 - Alta y baja de vacaciones, feriados y ausencias.
@@ -227,132 +221,81 @@ Alcance:
 - Cancelación y reprogramación manual.
 - Filtros por profesional y fecha.
 - Permisos para el rol `glowup_professional`.
-
-Nota de alcance:
-La fase se difiere completa (agenda, horarios, estados, notas, CRUD de
-servicios y profesionales y permisos). No se implementa una versión
-parcial en el tema porque la operación pertenece al plugin.
-
-Dependencias:
-Fases 3 y 4 cerradas.
+- CRUD completo de servicios y profesionales.
 
 Criterio de cierre:
-El equipo puede operar la agenda sin tocar la base de datos ni pedir
-intervención técnica.
+No aplica: la fase no se implementa en esta práctica.
 
 ------------------------------------------------------------
-FASE 7 — QA Y LANZAMIENTO
+FASE 7 — CIERRE DE LA PRÁCTICA
 ------------------------------------------------------------
 
 Estado: pendiente.
 
 Objetivo:
-Publicar el sitio y las reservas en producción con un riesgo controlado.
+Dejar el repositorio y la demo listos para la entrega universitaria,
+sin despliegue real.
 
 Alcance:
-- Pruebas integrales del flujo de reserva y pago.
-- Pruebas de cancelación, reprogramación y reembolso.
-- Revisión de accesibilidad, performance y responsive.
-- Revisión de textos legales y consentimiento de datos de salud.
-- Configuración de hosting, dominio y correo de producción.
-- Backup, monitoreo y plan de rollback.
-- Reemplazo de fotos y logo provisorios.
-- Cierre de la tienda pública: solo cartel "Próximamente".
+- README de entrega: alcance, estado, limitaciones y pasos para
+  ejecutar el tema en local.
+- Guion de demo: home, servicios, nosotras, contacto, turnos, wizard,
+  emails de ejemplo y tienda en "Próximamente".
+- Datos de ejemplo y limpieza de datos de prueba.
+- Revisión final del repositorio: sin credenciales, sin archivos
+  temporales y con `.gitignore` correcto.
+- Capturas o evidencia de la demo (opcional).
+- Fotos y logo definitivos (opcional; los placeholders son aceptables).
+- Presentación oral (opcional).
+
+Fuera de alcance:
+- QA formal, auditoría de accesibilidad/performance, revisión legal,
+  hosting, dominio, correo y despliegue.
 
 Dependencias:
-Fases 3 a 6 cerradas.
+Fases 0–5 cerradas y Fase 6 fuera de alcance.
 
 Criterio de cierre:
-Reservas y pagos funcionando en producción, con la tienda pública
-en pausa y un cartel claro de "Próximamente".
+El repositorio se puede entregar y la demo se puede recorrer en local
+con la documentación actualizada.
 
 ------------------------------------------------------------
-FASE 8 — TIENDA ONLINE (FUTURA)
+FUERA DE ALCANCE
 ------------------------------------------------------------
 
-Estado: futura. No se inicia hasta cerrar la Fase 7.
+Quedan fuera de la práctica:
 
-Objetivo:
-Abrir la tienda pública después del lanzamiento de las reservas.
+- Tienda online (antes Fase 8): catálogo público, carrito, checkout,
+  stock, cupones, envíos, gift card y devoluciones. Se conserva solo
+  el cartel "Próximamente" en `/tienda/`.
+- Post-MVP (antes Fase 9): packs/bonos, facturación fiscal,
+  fidelización, automatizaciones y reportes.
+- Operación interna (Fase 6): agenda diaria/semanal, horarios,
+  estados, notas y CRUD completo de servicios y profesionales.
+- Envío real de emails y recordatorios: plantillas definitivas, cron,
+  prevención de duplicados, SMTP, SPF y DKIM.
+- Producción: hosting, dominio, correo, backups, monitoreo, rollback
+  y cobro real.
+- QA formal, auditoría de accesibilidad/performance y revisión legal.
+- Cancelación y reprogramación desde la cuenta de la clienta.
 
-Esta fase no se estima ni se implementa ahora: solo se deja identificada
-como trabajo futuro. Durante el MVP no se avanza con catálogo, carrito
-ni checkout de productos.
-
-Durante el MVP:
-- `/tienda/` muestra solamente un cartel de "Próximamente".
-- No se muestran productos, precios, carrito ni checkout de la tienda.
-- No se puede completar una compra ni acceder al carrito o al checkout:
-  esas pantallas muestran "Próximamente".
-- El icono del carrito se oculta del encabezado y la sección de tienda de la home se reemplaza por un aviso de "Próximamente".
-- Los 18 productos pueden quedar cargados internamente, ocultos,
-  para no perder el trabajo ya hecho.
-- WooCommerce sigue activo para cuentas y órdenes de reservas; lo que
-  se pausa es la tienda pública, no el motor de cuentas.
-- La pausa aplica a la compra de productos. La pantalla de pago de una
-  reserva está exceptuada de la pausa; el cobro se habilita cuando
-  Mercado Pago tenga credenciales.
-
-Alcance futuro:
-- Catálogo público con categorías y fichas de producto.
-- Carrito y checkout por bloques.
-- Stock, variaciones y cupones.
-- Retiro en el salón sin costo.
-- Envío nacional con costos definidos.
-- Gift card simple.
-- Devoluciones y cambios.
-- Integración de pago de la tienda.
-- Textos legales de compra y envío.
-
-Dependencias:
-- Costos de envío y logística definidos.
-- Fotos reales de productos.
-- Textos legales de compra, envío y devoluciones.
-- Stock y responsable de preparación de pedidos.
-- Mercado Pago en producción.
-- Fases 3 a 7 cerradas.
-
-Criterio de cierre:
-La tienda permite comprar, cobrar, retirar o enviar, y gestionar
-pedidos sin afectar la agenda de turnos.
+La tienda pública ya está implementada como cartel "Próximamente".
+No se abre al público ni se implementa el comercio.
 
 ------------------------------------------------------------
-FASE 9 — POST-MVP (FUTURA)
+REGLA DE ALCANCE
 ------------------------------------------------------------
 
-Estado: futura.
+La práctica no se publica. El objetivo es demostrar el sitio y el flujo
+de reservas en local, con Mercado Pago en sandbox.
 
-Objetivo:
-Mejorar el negocio después de validar reservas y tienda.
+La tienda pública queda en "Próximamente": no se implementa comercio,
+no se muestran precios ni botones de compra y no se envía tráfico a
+carrito o checkout.
 
-Alcance:
-- Packs y bonos de servicios.
-- Facturación fiscal.
-- Programa de fidelización.
-- Mejoras de conversión y recordatorios.
-- Automatizaciones y reportes.
-- Otras integraciones.
-
-Dependencias:
-Fases 7 y 8 cerradas y negocio validado.
-
-------------------------------------------------------------
-REGLA DE ORO
-------------------------------------------------------------
-
-La tienda no bloquea el lanzamiento de las reservas. Primero se cierra
-el flujo de turnos con pago; después se abre la tienda.
-
-Esta pausa es solo para la compra de productos. WooCommerce sigue
-siendo la infraestructura de cuentas y órdenes de reservas; el
-checkout de una reserva se habilita cuando Mercado Pago esté
-configurado y no debe confundirse con la tienda.
-
-Mientras la tienda esté en pausa:
-- No prometer compras online desde la home ni desde el menú.
-- No mostrar precios ni botones de compra de productos.
-- No enviar tráfico de compras a `/carrito/` ni a `/finalizar-compra/`.
-- Mantener visible el cartel de "Próximamente" en `/tienda/`.
+WooCommerce sigue siendo la infraestructura de cuentas y órdenes de
+reservas. La pantalla `order-pay` de una reserva está exceptuada de la
+pausa y cobra solo en modo test.
 
 ------------------------------------------------------------
 ESTADO ACTUAL
@@ -360,12 +303,12 @@ ESTADO ACTUAL
 
 Completado:
 - Fases 0, 1, 2 y 3.
-- Fase 4 (núcleo): guarda de pago, confirmación, cancelación/reembolso,
-  conciliación de holds vencidos y revisión manual de pagos tardíos.
+- Fase 4 en sandbox: guarda de pago, confirmación, cancelación/reembolso,
+  conciliación de holds vencidos, webhooks reales y reembolso completo.
 - WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
 - Tema GlowUp 0.3.0 y plugin `glowup-turnos` 0.4.0, esquema 1.1.0.
-- Fase 5 (demo visual): confirmación, recordatorios de 24 h y 2 h y
-  cambio de turno visibles en `/turnos/`, sin envío de correos.
+- Fase 5 (demo visual, cerrada): confirmación, recordatorios de 24 h y
+  2 h y cambio de turno visibles en `/turnos/`, sin envío de correos.
 - 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
 - 18 productos cargados como catálogo interno.
 - API de disponibilidad, holds, órdenes y turnos.
@@ -378,48 +321,41 @@ Completado:
   adaptados a la pausa.
 
 Nota sobre la tienda:
-- La tienda está técnicamente armada y ahora pausada en el entorno local.
-- Esta reorganización define que la tienda pública pase a "Próximamente"
-  antes del lanzamiento. No se eliminan productos ni WooCommerce.
-- La base técnica de la tienda sigue siendo parte de la Fase 1; la
-  tienda pública completa es la Fase 8.
+- La tienda está técnicamente armada y pausada en el entorno local.
+- No se eliminan productos ni WooCommerce: se conserva la base técnica
+  de la Fase 1 y el cartel "Próximamente".
+- La tienda pública completa queda fuera de alcance; no es una fase de
+  esta práctica.
 
 Siguiente:
-- Fase 5: implementar el envío real de emails y recordatorios.
+- Fase 7: cierre de la práctica.
 
-Pendiente funcional:
-- Cancelación y reprogramación desde la cuenta de la clienta.
-- Emails transaccionales y recordatorios.
+Pendiente para el cierre:
+- README de entrega y guion de demo.
+- Limpieza de datos de prueba y revisión final del repositorio.
 
-Diferido:
-- Fase 6 (operación): agenda diaria/semanal, horarios semanales, estados,
-  notas, cancelación/reprogramación manual y CRUD completo de servicios y
-  profesionales. El plugin se desarrolla en otro equipo y no está en este
-  entorno; no afecta el resultado del tema ni del flujo público.
-
-Bloqueado:
-- Fase 5: el envío real se implementa en el plugin `glowup-turnos`, que
-  no está disponible en este entorno.
-
-Pendiente de terceros:
+Opcional:
 - Fotos y logo definitivos.
-- Textos legales definitivos.
-- Hosting, dominio y correo de producción.
-- Costos de envío y dirección exacta del salón.
+- Capturas y presentación oral.
+
+Fuera de alcance:
+- Fase 6 (operación): agenda diaria/semanal, horarios, estados, notas y
+  CRUD completo de servicios y profesionales.
+- Envío real de emails y recordatorios.
+- Tienda online y post-MVP.
+- Producción, hosting, dominio, correo, backups, monitoreo y rollback.
+- QA formal, auditoría de accesibilidad/performance y revisión legal.
+- Cancelación y reprogramación desde la cuenta de la clienta.
 
 ------------------------------------------------------------
 PRÓXIMOS PASOS
 ------------------------------------------------------------
 
-1. Implementar el envío real de emails transaccionales y recordatorios
-   (Fase 5) en el plugin `glowup-turnos`.
-2. Definir e implementar cancelación y reprogramación desde la cuenta
-   de la clienta.
-3. Retomar la Fase 6 cuando el plugin esté disponible; no forma parte
-   de esta entrega.
-4. Reemplazar placeholders con fotos y cerrar textos legales.
-5. Ejecutar QA integral y preparar el lanzamiento (Fase 7).
-6. Recién después, abrir la tienda online como Fase 8.
+1. Crear el README de entrega con alcance, estado, limitaciones y
+   pasos para ejecutar el tema en local.
+2. Preparar el guion de demo y limpiar los datos de prueba.
+3. Revisar el repositorio y dejar el árbol listo para entregar.
+4. (Opcional) Reemplazar fotos y logo, y preparar la presentación.
 
 ============================================================
 Fin del documento.

@@ -160,6 +160,8 @@ function glowup_get_professionals() {
  * @return array
  */
 function glowup_get_process_steps() {
+	$payment_available = function_exists( 'glowup_booking_payments_available' ) && glowup_booking_payments_available();
+
 	return array(
 		array(
 			'number' => '01',
@@ -169,7 +171,9 @@ function glowup_get_process_steps() {
 		array(
 			'number' => '02',
 			'title'  => 'Reservá y confirmá',
-			'text'   => 'Elegí día y horario, guardá tu lugar y completá el pago cuando esté disponible.',
+			'text'   => $payment_available
+				? 'Elegí día y horario, guardá tu lugar y pagá online para confirmar el turno.'
+				: 'Elegí día y horario, guardá tu lugar y completá el pago cuando esté disponible.',
 		),
 		array(
 			'number' => '03',
@@ -269,11 +273,16 @@ function glowup_get_faq_items() {
  * @return array
  */
 function glowup_get_booking_policies() {
+	$payment_available = function_exists( 'glowup_booking_payments_available' ) && glowup_booking_payments_available();
+
 	return array(
 		'cancel'    => 'Podés cancelar hasta 24 horas antes y te devolvemos el pago completo.',
 		'reschedule'=> 'Podés reprogramar hasta 12 horas antes, sujeto a disponibilidad.',
 		'late'      => 'Si llegás tarde, el servicio puede acortarse para no afectar los turnos siguientes.',
 		'noshow'    => 'Si no te presentás, el turno se considera ausente y no genera reembolso.',
 		'refund'    => 'Los reembolsos se procesan por el mismo medio de pago. El plazo depende de Mercado Pago y de tu banco.',
+		'payment'   => $payment_available
+			? 'Pagás el total online con Mercado Pago al confirmar la reserva. Si el pago no se acredita, el horario se libera.'
+			: 'El pago online se habilita en la próxima etapa. Mientras tanto, la reserva queda pendiente de pago y no se realizan cobros.',
 	);
 }

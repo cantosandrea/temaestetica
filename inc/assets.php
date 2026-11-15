@@ -104,6 +104,7 @@ function glowup_enqueue_booking_assets() {
 		'glowup-booking',
 		'glowupBooking',
 		array(
+<<<<<<< HEAD
 			'restUrl'         => esc_url_raw( rest_url( 'glowup/v1/' ) ),
 			'nonce'           => wp_create_nonce( 'wp_rest' ),
 			'isLoggedIn'      => is_user_logged_in(),
@@ -124,6 +125,28 @@ function glowup_enqueue_booking_assets() {
 			'termsUrl'        => esc_url_raw( $terms_url ),
 			'cancelUrl'       => esc_url_raw( glowup_booking_legal_url( 'politica-de-cancelacion' ) ),
 			'i18n'            => array(
+=======
+			'restUrl'        => esc_url_raw( rest_url( 'glowup/v1/' ) ),
+			'nonce'          => wp_create_nonce( 'wp_rest' ),
+			'isLoggedIn'     => is_user_logged_in(),
+			'canBook'        => glowup_booking_can_book(),
+			'bookingUrl'     => glowup_booking_url(),
+			'accountUrl'     => glowup_account_url(),
+			'loginUrl'       => glowup_booking_url() . '#cuenta',
+			'currency'       => function_exists( 'get_woocommerce_currency_symbol' ) ? html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ) : '$',
+			'holdMinutes'    => $hold_minutes,
+			'maxAdvanceDays' => $max_advance_days,
+			'paymentAvailable' => glowup_booking_payments_available(),
+			'paymentMode'    => $payment_mode,
+			'depositPercent' => $deposit_percent,
+			'timezone'       => $timezone,
+			'today'          => $booking_today,
+			'maxDate'        => $booking_max_date,
+			'privacyUrl'     => esc_url_raw( $privacy_url ),
+			'termsUrl'       => esc_url_raw( $terms_url ),
+			'cancelUrl'      => esc_url_raw( glowup_booking_legal_url( 'politica-de-cancelacion' ) ),
+			'i18n'           => array(
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 				'loadingServices'      => __( 'Cargando servicios…', 'temaestetica' ),
 				'loadingProfessionals' => __( 'Buscando profesionales…', 'temaestetica' ),
 				'loadingSlots'         => __( 'Buscando horarios disponibles…', 'temaestetica' ),

@@ -3,15 +3,23 @@ GLOWUP — FASES DEL PROYECTO
 ============================================================
 
 Actualizado: 15 de noviembre de 2026
+<<<<<<< HEAD
 Criterio: entrega de un trabajo práctico universitario. Se
 entrega el sitio de marca y el flujo de reserva sin cobro.
 Pagos, emails, operación diaria y lanzamiento quedan fuera
 del alcance.
+=======
+Criterio: proyecto de práctica universitaria. El alcance se limita al
+sitio de marca y al flujo de reservas con pago en sandbox. La tienda
+online, la operación interna, el envío real de emails y el despliegue
+quedan fuera de alcance.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 ------------------------------------------------------------
 RESUMEN
 ------------------------------------------------------------
 
+<<<<<<< HEAD
 Fase 0   Descubrimiento                  Completada
 Fase 1   Base técnica                    Completada
 Fase 2   Motor de agenda                 Completada
@@ -28,6 +36,20 @@ facturación fiscal y fidelización no aplican a la entrega.
 El estado de cada fase refleja el código y la documentación al
 15 de noviembre de 2026. Las fases 4, 5 y 6 no se marcan como
 completadas.
+=======
+Fase 0   Descubrimiento                        Completada
+Fase 1   Base técnica                          Completada
+Fase 2   Motor de agenda                       Completada
+Fase 3   Wizard de reserva y cuenta            Completada
+Fase 4   Pagos                                 Completada en sandbox
+Fase 5   Emails                                Demo visual cerrada (envío real fuera de alcance)
+Fase 6   Operación                             Fuera de alcance (plugin en otro equipo)
+Fase 7   Cierre de la práctica                 Pendiente
+
+Las antiguas fases 8 (tienda online) y 9 (post-MVP) se retiran del
+plan de la práctica. La tienda pública queda solo con el cartel
+"Próximamente" y no se implementa el comercio.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 ------------------------------------------------------------
 FASE 0 — DESCUBRIMIENTO
@@ -138,7 +160,14 @@ pendiente de pago. El cobro no forma parte de la entrega.
 FASE 4 — PAGOS (FUERA DE ALCANCE)
 ------------------------------------------------------------
 
+<<<<<<< HEAD
 Estado: iniciada y detenida. No forma parte de la entrega.
+=======
+Estado: completada en sandbox. El núcleo de pagos está implementado y
+verificado con webhooks reales, pagos pendientes/rechazados/aprobados,
+conciliación de holds vencidos y reembolso completo. La producción y el
+cobro real quedan fuera de alcance.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 Qué hay:
 - `glowup_booking_payments_enabled()` apagado por defecto y filtrable.
@@ -148,6 +177,7 @@ Qué hay:
   estado de pagos.
 - La reserva termina en una orden pendiente, sin cobro.
 
+<<<<<<< HEAD
 Qué falta:
 - Integración de Mercado Pago en sandbox.
 - Webhooks y confirmación automática del turno al acreditarse el pago.
@@ -179,11 +209,71 @@ Qué faltaría:
 Por qué queda afuera:
 Enviar correo real exige un servidor SMTP y pruebas de entregabilidad.
 La entrega no incluye notificaciones.
+=======
+Alcance implementado:
+- Guarda server-side que bloquea el pago si la retención venció o el
+  turno ya no está pendiente.
+- Confirmación automática del turno cuando la orden pasa a un estado
+  pagado (`processing` o `completed`).
+- Cancelación del turno cuando la orden se cancela o se reembolsa.
+- Conciliación de holds vencidos: el turno pasa a `expired` y la orden
+  `pending`/`failed` asociada se cancela.
+- Pago tardío: se confirma si el horario sigue libre y el turno es
+  futuro; si no, la orden queda marcada para revisión manual y reembolso.
+- Los turnos `cancelled`, `completed` y `no_show` no se resucitan solos.
+- UI del tema condicionada a la disponibilidad de una pasarela: textos,
+  CTA del wizard, aviso y botón de `order-pay`.
+- Redirección clara cuando la retención venció antes de pagar.
+- Checkout sandbox aprobado y webhooks reales de Mercado Pago por ngrok.
+- Reembolso completo desde WooCommerce con pedido `refunded` y turno
+  `cancelled`.
+
+Fuera de alcance:
+- Validación con credenciales de producción y cobro real.
+- Reembolsos por cancelación desde la cuenta de la clienta.
+
+Dependencias:
+Fase 3 cerrada y Mercado Pago en modo test con credenciales de sandbox.
+
+Criterio de cierre:
+Un turno pagado queda confirmado y uno no pagado libera el horario, con
+checkout, webhooks y reembolsos probados en sandbox.
+
+------------------------------------------------------------
+FASE 5 — EMAILS (DEMO VISUAL)
+------------------------------------------------------------
+
+Estado: cerrada como demo visual. El envío real queda fuera de alcance
+de la práctica.
+
+Objetivo:
+Mostrar cómo se verán los avisos de la reserva dentro del sitio.
+
+Alcance implementado:
+- Cuatro tarjetas en `/turnos/`: confirmación, recordatorio de 24 h,
+  recordatorio de 2 h y cambio de turno.
+- Vista previa modal con datos de ejemplo.
+- Copy que aclara que el envío no está activo.
+- Sin integración con `wp_mail`, sin cron y sin SMTP.
+
+Fuera de alcance:
+- Envío real, plantillas definitivas, recordatorios automáticos,
+  prevención de duplicados y SMTP/SPF/DKIM.
+- La implementación pertenece al plugin `glowup-turnos`, que no está
+  disponible en este entorno.
+
+Dependencias:
+Ninguna adicional; la demo usa datos de ejemplo.
+
+Criterio de cierre:
+La demo visual está integrada y no promete el envío real.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 ------------------------------------------------------------
 FASE 6 — OPERACIÓN (FUERA DE ALCANCE)
 ------------------------------------------------------------
 
+<<<<<<< HEAD
 Estado: pendiente. No forma parte de la entrega.
 
 Qué hay:
@@ -192,12 +282,23 @@ Qué hay:
 - Listados de servicios y profesionales.
 
 Qué faltaría:
+=======
+Estado: fuera de alcance. El plugin `glowup-turnos`, dueño de la agenda,
+se desarrolla en otro equipo y no está disponible en este entorno.
+
+Motivo:
+La operación interna no forma parte del tema ni de la entrega de la
+práctica. No se implementa una versión parcial en el tema.
+
+Alcance excluido:
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 - Vista diaria y semanal de turnos.
 - Edición de horarios semanales por profesional.
 - Cambio de estado de turnos.
 - Notas internas.
 - Cancelación y reprogramación manual.
 - Filtros por profesional y fecha.
+<<<<<<< HEAD
 - Permisos completos para el rol `glowup_professional`.
 
 Por qué queda afuera:
@@ -206,11 +307,22 @@ se evalúa con la agenda de bloqueos y el wizard.
 
 ------------------------------------------------------------
 FASE 7 — CIERRE Y ENTREGA ACADÉMICA
+=======
+- Permisos para el rol `glowup_professional`.
+- CRUD completo de servicios y profesionales.
+
+Criterio de cierre:
+No aplica: la fase no se implementa en esta práctica.
+
+------------------------------------------------------------
+FASE 7 — CIERRE DE LA PRÁCTICA
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 ------------------------------------------------------------
 
 Estado: completada.
 
 Objetivo:
+<<<<<<< HEAD
 Dejar el repositorio listo para presentar y defender el trabajo
 práctico.
 
@@ -284,6 +396,71 @@ FUERA DE ALCANCE DE ESTA ENTREGA
 - Cancelación y reprogramación desde la cuenta.
 - Tienda pública: catálogo, carrito, checkout y envíos.
 - Packs, bonos, fidelización y facturación fiscal.
+=======
+Dejar el repositorio y la demo listos para la entrega universitaria,
+sin despliegue real.
+
+Alcance:
+- README de entrega: alcance, estado, limitaciones y pasos para
+  ejecutar el tema en local.
+- Guion de demo: home, servicios, nosotras, contacto, turnos, wizard,
+  emails de ejemplo y tienda en "Próximamente".
+- Datos de ejemplo y limpieza de datos de prueba.
+- Revisión final del repositorio: sin credenciales, sin archivos
+  temporales y con `.gitignore` correcto.
+- Capturas o evidencia de la demo (opcional).
+- Fotos y logo definitivos (opcional; los placeholders son aceptables).
+- Presentación oral (opcional).
+
+Fuera de alcance:
+- QA formal, auditoría de accesibilidad/performance, revisión legal,
+  hosting, dominio, correo y despliegue.
+
+Dependencias:
+Fases 0–5 cerradas y Fase 6 fuera de alcance.
+
+Criterio de cierre:
+El repositorio se puede entregar y la demo se puede recorrer en local
+con la documentación actualizada.
+
+------------------------------------------------------------
+FUERA DE ALCANCE
+------------------------------------------------------------
+
+Quedan fuera de la práctica:
+
+- Tienda online (antes Fase 8): catálogo público, carrito, checkout,
+  stock, cupones, envíos, gift card y devoluciones. Se conserva solo
+  el cartel "Próximamente" en `/tienda/`.
+- Post-MVP (antes Fase 9): packs/bonos, facturación fiscal,
+  fidelización, automatizaciones y reportes.
+- Operación interna (Fase 6): agenda diaria/semanal, horarios,
+  estados, notas y CRUD completo de servicios y profesionales.
+- Envío real de emails y recordatorios: plantillas definitivas, cron,
+  prevención de duplicados, SMTP, SPF y DKIM.
+- Producción: hosting, dominio, correo, backups, monitoreo, rollback
+  y cobro real.
+- QA formal, auditoría de accesibilidad/performance y revisión legal.
+- Cancelación y reprogramación desde la cuenta de la clienta.
+
+La tienda pública ya está implementada como cartel "Próximamente".
+No se abre al público ni se implementa el comercio.
+
+------------------------------------------------------------
+REGLA DE ALCANCE
+------------------------------------------------------------
+
+La práctica no se publica. El objetivo es demostrar el sitio y el flujo
+de reservas en local, con Mercado Pago en sandbox.
+
+La tienda pública queda en "Próximamente": no se implementa comercio,
+no se muestran precios ni botones de compra y no se envía tráfico a
+carrito o checkout.
+
+WooCommerce sigue siendo la infraestructura de cuentas y órdenes de
+reservas. La pantalla `order-pay` de una reserva está exceptuada de la
+pausa y cobra solo en modo test.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 ------------------------------------------------------------
 ESTADO ACTUAL
@@ -291,18 +468,30 @@ ESTADO ACTUAL
 
 Completado:
 - Fases 0, 1, 2 y 3.
+<<<<<<< HEAD
 - Fase 7: documentación de cierre y entrega.
 - WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
 - Tema GlowUp 0.3.0 y plugin `glowup-turnos` 0.3.0, esquema 1.1.0.
+=======
+- Fase 4 en sandbox: guarda de pago, confirmación, cancelación/reembolso,
+  conciliación de holds vencidos, webhooks reales y reembolso completo.
+- WordPress 7.1.4, WooCommerce 11.3.0 y PHP 8.2.12.
+- Tema GlowUp 0.3.0 y plugin `glowup-turnos` 0.4.0, esquema 1.1.0.
+- Fase 5 (demo visual, cerrada): confirmación, recordatorios de 24 h y
+  2 h y cambio de turno visibles en `/turnos/`, sin envío de correos.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 - 29 servicios, 2 profesionales, 29 relaciones y 12 bloques horarios.
 - 18 productos cargados como catálogo interno.
 - API de disponibilidad, holds, órdenes y turnos.
 - Agenda de bloqueos en el panel.
 - Wizard público de reserva con cuenta, retención y orden pendiente.
+- UI de pago condicionada a la disponibilidad de una pasarela; sin
+  credenciales no se ofrece cobro.
 - Tienda pública pausada: `/tienda/`, fichas de producto, carrito y
   checkout de productos muestran el cartel de "Próximamente". Home y
   encabezado adaptados a la pausa.
 
+<<<<<<< HEAD
 Fase 4:
 - Iniciada y detenida. El interruptor de pagos sigue apagado y no se
   realiza ningún cobro.
@@ -320,11 +509,40 @@ Nota sobre el Word:
 - `docs/GlowUp-Proyecto.docx` quedó con fecha 12 de noviembre de 2026.
 - Esta entrega actualiza los archivos Markdown y este documento de
   fases. El Word formal no se editó.
+=======
+Nota sobre la tienda:
+- La tienda está técnicamente armada y pausada en el entorno local.
+- No se eliminan productos ni WooCommerce: se conserva la base técnica
+  de la Fase 1 y el cartel "Próximamente".
+- La tienda pública completa queda fuera de alcance; no es una fase de
+  esta práctica.
+
+Siguiente:
+- Fase 7: cierre de la práctica.
+
+Pendiente para el cierre:
+- README de entrega y guion de demo.
+- Limpieza de datos de prueba y revisión final del repositorio.
+
+Opcional:
+- Fotos y logo definitivos.
+- Capturas y presentación oral.
+
+Fuera de alcance:
+- Fase 6 (operación): agenda diaria/semanal, horarios, estados, notas y
+  CRUD completo de servicios y profesionales.
+- Envío real de emails y recordatorios.
+- Tienda online y post-MVP.
+- Producción, hosting, dominio, correo, backups, monitoreo y rollback.
+- QA formal, auditoría de accesibilidad/performance y revisión legal.
+- Cancelación y reprogramación desde la cuenta de la clienta.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 ------------------------------------------------------------
 PRÓXIMOS PASOS
 ------------------------------------------------------------
 
+<<<<<<< HEAD
 1. Preparar la cuenta de clienta y los datos de la demo.
 2. Recorrer `docs/GUIA-DEMO.md` y capturar las pantallas.
 3. Presentar el proyecto.
@@ -338,6 +556,13 @@ CRITERIO DE LA ENTREGA
 La demo muestra el sitio de marca, el wizard de reserva y la tienda
 pausada. El flujo termina en una orden pendiente de pago. No se
 prometen cobros ni compras online.
+=======
+1. Crear el README de entrega con alcance, estado, limitaciones y
+   pasos para ejecutar el tema en local.
+2. Preparar el guion de demo y limpiar los datos de prueba.
+3. Revisar el repositorio y dejar el árbol listo para entregar.
+4. (Opcional) Reemplazar fotos y logo, y preparar la presentación.
+>>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 
 ============================================================
 Fin del documento.

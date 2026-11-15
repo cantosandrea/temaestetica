@@ -232,6 +232,58 @@
 	}
 
 	/* ---------------------------------------------------------------
+	 * Email demo dialogs (visual samples only)
+	 * ------------------------------------------------------------- */
+	var emailTriggers = doc.querySelectorAll('[data-email-demo]');
+	var emailDialogs = doc.querySelectorAll('.email-modal');
+
+	if (emailTriggers.length && emailDialogs.length) {
+		var syncEmailBodyState = function () {
+			body.classList.toggle('email-modal-open', null !== doc.querySelector('.email-modal[open]'));
+		};
+
+		emailTriggers.forEach(function (trigger) {
+			trigger.addEventListener('click', function () {
+				var dialog = doc.getElementById('email-demo-' + trigger.getAttribute('data-email-demo'));
+
+				if (!dialog || typeof dialog.showModal !== 'function') {
+					return;
+				}
+
+				dialog.showModal();
+				body.classList.add('email-modal-open');
+			});
+		});
+
+		emailDialogs.forEach(function (dialog) {
+			var closeButton = dialog.querySelector('[data-email-close]');
+
+			dialog.addEventListener('close', syncEmailBodyState);
+
+			if (closeButton) {
+				closeButton.addEventListener('click', function () {
+					dialog.close();
+				});
+			}
+
+			/* Clicks on the backdrop land on the dialog element itself. Compare
+			 * against its box so clicks inside the panel never close it. */
+			dialog.addEventListener('click', function (event) {
+				if (event.target !== dialog) {
+					return;
+				}
+
+				var rect = dialog.getBoundingClientRect();
+				var inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+
+				if (!inside) {
+					dialog.close();
+				}
+			});
+		});
+	}
+
+	/* ---------------------------------------------------------------
 	 * Scroll reveal
 	 * ------------------------------------------------------------- */
 	var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -246,6 +298,7 @@
 			'.process-step',
 			'.policy-card',
 			'.contact-card',
+			'.email-card',
 			'.post-card',
 			'.page-hero__inner',
 			'.booking-status__step'

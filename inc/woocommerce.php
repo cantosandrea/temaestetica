@@ -82,14 +82,7 @@ function glowup_booking_pay_order_notice() {
 		return;
 	}
 
-<<<<<<< HEAD
-	$message = glowup_booking_payments_enabled()
-		? __( 'Este pedido corresponde a un turno. Completá el pago para confirmar tu reserva.', 'temaestetica' )
-		: __( 'Este pedido corresponde a un turno. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' );
-
-	echo '<div class="woocommerce-info glow-booking-pay-notice">' . esc_html( $message ) . '</div>';
-=======
-	if ( ! glowup_booking_payments_available() ) {
+	if ( ! glowup_booking_payments_enabled() || ! glowup_booking_payments_available() ) {
 		echo '<div class="woocommerce-info glow-booking-pay-notice">' . esc_html__( 'Este pedido corresponde a un turno. El pago online se habilita en la próxima etapa; no se realizó ningún cobro.', 'temaestetica' ) . '</div>';
 		return;
 	}
@@ -120,7 +113,6 @@ function glowup_booking_pay_order_notice() {
 			$minutes
 		)
 	) . '</div>';
->>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
 }
 add_action( 'woocommerce_pay_order_before_payment', 'glowup_booking_pay_order_notice' );
 
@@ -158,17 +150,13 @@ add_action( 'before_woocommerce_pay', 'glowup_booking_guard_pay_request' );
  * @return string
  */
 function glowup_booking_no_payment_methods_message( $message ) {
-<<<<<<< HEAD
-	if ( glowup_booking_order_from_pay_request() && ! glowup_booking_payments_enabled() ) {
-=======
 	$order = glowup_booking_order_from_pay_request();
 
 	if ( ! $order ) {
 		return $message;
 	}
 
-	if ( ! glowup_booking_payments_available() ) {
->>>>>>> b7d8c1680d2c54e2eee93aefa1543aa879dae466
+	if ( ! glowup_booking_payments_enabled() || ! glowup_booking_payments_available() ) {
 		return __( 'El pago online estará disponible próximamente. Tu pedido queda pendiente y el horario se libera cuando vence la retención.', 'temaestetica' );
 	}
 

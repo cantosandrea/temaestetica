@@ -780,7 +780,7 @@
 			if (Number(data.hold_expires_in) > 0) {
 				var minutes = Math.ceil(Number(data.hold_expires_in) / 60);
 
-				els.orderHoldNote.textContent = config.paymentAvailable
+				els.orderHoldNote.textContent = config.paymentsEnabled && config.paymentAvailable
 					? 'El horario queda retenido por ' + minutes + ' minutos. Si no se acredita el pago, se libera automáticamente.'
 					: 'El horario queda retenido por ' + minutes + ' minutos. El pago online todavía no está habilitado, así que no se realiza ningún cobro.';
 			} else {
@@ -789,7 +789,7 @@
 		}
 
 		if (els.orderPay) {
-			if (config.paymentAvailable && data.payment_url) {
+			if (config.paymentsEnabled && config.paymentAvailable && data.payment_url) {
 				els.orderPay.href = data.payment_url;
 				els.orderPay.hidden = false;
 			} else {
@@ -810,7 +810,7 @@
 		if (els.orderView) {
 			const detailUrl = data.view_url || config.accountUrl;
 
-			els.orderView.href = config.paymentsEnabled && data.pay_url ? data.pay_url : detailUrl;
+			els.orderView.href = config.paymentsEnabled && config.paymentAvailable && data.pay_url ? data.pay_url : detailUrl;
 		}
 	}
 

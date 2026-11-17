@@ -1,6 +1,6 @@
 # Guía de demo
 
-Recorrido para presentar GlowUp en la facultad. Dura entre 10 y 15 minutos.
+Recorrido para presentar GlowUp en la facultad. Dura entre 12 y 15 minutos.
 
 ## Antes de la demo
 
@@ -12,7 +12,9 @@ Recorrido para presentar GlowUp en la facultad. Dura entre 10 y 15 minutos.
 - [ ] Servicios, profesionales y horarios sembrados.
 - [ ] Imágenes cargadas en el Customizer.
 - [ ] `/tienda/` muestra “Próximamente” en una ventana sin sesión.
-- [ ] Turnos de prueba viejos cancelados o eliminados.
+- [ ] La sección `#emails` de `/turnos/` muestra las cuatro tarjetas y abre el modal.
+- [ ] El interruptor de pagos sigue apagado (`glowup_booking_payments_enabled()` en `false`).
+- [ ] Datos de prueba limpios: 0 turnos y 0 órdenes.
 - [ ] Navegador con la consola abierta para detectar errores.
 
 ## Datos de la demo
@@ -41,11 +43,11 @@ Recorré las categorías: uñas, cabello, facial y depilación definitiva. Mostr
 
 Perfiles de Agustina y Estela. En Contacto, dirección, horarios, email y preguntas frecuentes.
 
-### 4. Turnos sin sesión (2 minutos)
+### 4. Turnos sin sesión (1 minuto)
 
 Entrá a `/turnos/`. Mostrá el formulario de registro. Creá una cuenta nueva o iniciá sesión con la cuenta de prueba. Explicá que la cuenta es un usuario de WooCommerce con rol `customer`.
 
-### 5. Wizard (5 minutos)
+### 5. Wizard (4 minutos)
 
 1. Elegí un servicio.
 2. Elegí la profesional habilitada.
@@ -54,13 +56,19 @@ Entrá a `/turnos/`. Mostrá el formulario de registro. Creá una cuenta nueva o
 5. Retené el horario. Mostrá el contador de 15 minutos.
 6. Confirmá la reserva. Mostrá el código, el número de pedido y el estado pendiente.
 
-Aclaración para el jurado: no hay cobro. La orden queda pendiente y el horario se libera al vencer la retención.
+Aclaración para el jurado: no hay cobro. La integración con Mercado Pago se probó en sandbox, pero el interruptor quedó apagado por defecto. La orden queda pendiente y el horario se libera al vencer la retención.
 
-### 6. Mi cuenta (1 minuto)
+### 6. Emails de ejemplo (2 minutos)
+
+Bajá hasta `#emails` dentro de `/turnos/`. Mostrá las cuatro tarjetas: confirmación, recordatorio de 24 h, recordatorio de 2 h y cambio de turno. Abrí uno de los modales y señalá que son datos de ejemplo.
+
+Aclaración para el jurado: la demo es visual. No se envía ningún correo: no hay `wp_mail`, cron ni SMTP en este flujo.
+
+### 7. Mi cuenta (1 minuto)
 
 Abrí Mi cuenta y mostrá el pedido pendiente. Si el tiempo alcanza, mostrá el detalle del pedido y el aviso de que el pago online se habilita en otra etapa.
 
-### 7. Panel de administración (2 minutos)
+### 8. Panel de administración (2 minutos)
 
 Entrá con la cuenta de administradora. Recorré:
 
@@ -78,7 +86,8 @@ Cerrá con la tienda. `/tienda/` muestra “Próximamente” para visitantes.
 - La retención usa `GET_LOCK` por profesional, transacción y revalidación de solapamientos.
 - La creación de la orden es idempotente: un doble envío reutiliza la orden existente.
 - La tienda pública está pausada, pero WooCommerce sigue activo para cuentas y órdenes de reserva.
-- El interruptor `glowup_booking_payments_enabled()` controla el cobro y sigue apagado.
+- El interruptor `glowup_booking_payments_enabled()` controla el cobro y sigue apagado. El pago solo se muestra si el interruptor está encendido **y** hay una pasarela disponible.
+- La demo de `#emails` es visual: no envía correos.
 
 ## Preguntas probables
 
@@ -95,10 +104,13 @@ El plugin bloquea por profesional con `GET_LOCK`, abre una transacción y vuelve
 La retención vence a los 15 minutos. El turno pasa a `expired` y el horario vuelve a estar disponible.
 
 **¿Por qué no se cobra?**
-La integración de Mercado Pago necesita credenciales y cuentas reales. Queda fuera de la entrega. El flujo termina con la orden pendiente.
+Porque el cobro online está apagado por defecto: `glowup_booking_payments_enabled()` devuelve `false`. La integración se probó en sandbox con Mercado Pago, pero para cobrar de verdad hacen falta credenciales de producción y validar la cuenta real, algo que queda fuera de la entrega. El flujo termina con la orden pendiente.
+
+**¿Los emails se envían de verdad?**
+No. La sección `#emails` es una demo visual con datos de ejemplo. No hay `wp_mail`, cron ni SMTP; el envío real pertenece al plugin y queda fuera de alcance.
 
 **¿Qué falta para producción?**
-Cobro, emails, agenda operativa, hosting, dominio, textos legales y QA.
+Encender y validar el cobro real con credenciales propias, implementar el envío de emails, la agenda operativa (en el plugin), hosting, dominio, textos legales y QA.
 
 **¿La tienda está terminada?**
 No. La tienda pública muestra “Próximamente” a propósito. WooCommerce se usa para cuentas y órdenes de reserva.
@@ -110,11 +122,12 @@ No. La tienda pública muestra “Próximamente” a propósito. WooCommerce se 
 - Wizard en el paso de fecha y hora.
 - Resumen con la retención activa.
 - Pantalla final con el pedido pendiente.
+- Sección `#emails` con las cuatro tarjetas y un modal abierto.
 - Mi cuenta con el pedido.
 - Panel GlowUp y agenda de bloqueos.
 - `/tienda/` con el cartel “Próximamente”.
 
-Guardalas en la entrega si la cátedra las pide.
+Guardalas en la entrega si la cátedra las pide. Las capturas de referencia ya están en `docs/capturas/`.
 
 ## Plan B
 

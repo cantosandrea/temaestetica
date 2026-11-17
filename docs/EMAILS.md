@@ -1,11 +1,18 @@
 # GlowUp — Emails y recordatorios
 
-**Versión:** 0.1.0
-**Actualizado:** 14 de noviembre de 2026
-**Estado:** prerrequisitos de la Fase 5 resueltos; implementación pendiente.
+**Versión:** 0.2.0
+**Actualizado:** 16 de noviembre de 2026
+**Estado:** Fase 5 cerrada como demo visual en `/turnos/#emails`; el envío real no está implementado y queda fuera de alcance.
 **Ámbito:** entorno local `http://localhost/esteticaweb`
 
-Este documento fija las decisiones de la Fase 5 para que la implementación arranque sin bloqueos. **No implementa todavía** los emails ni los recordatorios: define el transporte, la matriz de mensajes, los destinatarios, los disparadores, la idempotencia y el plan de pruebas.
+Este documento conserva el diseño de la Fase 5. La demo visual ya está integrada; **el envío real no está implementado y queda fuera de alcance**. Salvo esa demo, lo que sigue describe cómo se implementaría el envío: transporte, matriz de mensajes, destinatarios, disparadores, idempotencia y plan de pruebas.
+
+## 0. Demo visual implementada (Fase 5)
+
+- `/turnos/#emails` muestra cuatro tarjetas: confirmación, recordatorio de 24 h, recordatorio de 2 h y cambio de turno.
+- Cada tarjeta abre un `<dialog>` nativo con datos de ejemplo.
+- No usa `wp_mail`, cron ni SMTP: no envía correos.
+- El resto de este documento es diseño para una implementación futura en el plugin `glowup-turnos`.
 
 ---
 
@@ -21,7 +28,7 @@ Este documento fija las decisiones de la Fase 5 para que la implementación arra
 | Remitente | `GlowUp <no-reply@glowup.local>` |
 | Respuestas | `Reply-To: hola@glowup.local` (valor de `notification_email`; lo agrega el plugin al armar cada email en la Fase 5) |
 
-Verificado el 14 de noviembre de 2026:
+Verificado el 14 de noviembre de 2026 (para WooCommerce y pruebas puntuales; la demo de reservas no envía correos):
 
 - `wp_mail()` devuelve `true` y el mensaje aparece en Mailpit.
 - Un email real de WooCommerce (`WC_Email_Customer_Processing_Order`) llega a la bandeja con el remitente configurado.
@@ -51,7 +58,7 @@ Queda disponible un acceso directo en el inicio de sesión de Windows (`Mailpit 
 ## 2. Decisiones de arquitectura
 
 1. **El plugin es dueño de los emails de reserva.** `glowup-turnos` arma y envía los mensajes de ciclo de vida del turno con `wp_mail` y plantillas propias. No se usan las plantillas genéricas de WooCommerce para las órdenes de reserva.
-2. **WooCommerce sigue siendo dueño de los emails de cuenta y de pedidos que no son reservas.** En la Fase 8, la tienda pública conserva sus emails actuales.
+2. **WooCommerce sigue siendo dueño de los emails de cuenta y de pedidos que no son reservas.** En la tienda futura, la tienda pública conservaría sus emails actuales.
 3. **Se suprimen los emails genéricos de WooCommerce para órdenes de reserva.** Evita duplicados y copy incorrecto (“tu pedido está en camino” para un turno). El detalle está en la sección 7.
 4. **Un evento, un email.** Cada clave de email se envía una sola vez por turno/orden. La idempotencia se registra en una tabla propia, no en transients.
 5. **Destinatarios:**
@@ -209,7 +216,7 @@ Los emails de WooCommerce para pedidos que no son reservas (tienda futura) no se
 
 ## 8. Ajustes existentes
 
-| Ajuste | Uso en Fase 5 |
+| Ajuste | Uso previsto en una implementación futura |
 | --- | --- |
 | `notification_email` | Copia interna y `Reply-To`; por defecto `hola@glowup.local` |
 | `email_reminders` | Interruptor maestro de recordatorios |
@@ -245,7 +252,7 @@ Se propone una tabla propia, `wp_glowup_email_log`, con esquema `1.2.0`:
 
 ---
 
-## 10. Plan de pruebas
+## 10. Plan de pruebas de una implementación futura
 
 1. **Transporte:** `wp_mail()` y un email de WooCommerce llegan a Mailpit con remitente y `Reply-To` correctos.
 2. **Reserva creada:** crear un turno y una orden; verificar asunto, datos, botón de pago, vencimiento y versión de texto plano.
@@ -279,7 +286,18 @@ Se propone una tabla propia, `wp_glowup_email_log`, con esquema `1.2.0`:
 
 ---
 
-## 12. Criterios de aceptación de la Fase 5
+## 12. Criterios de aceptación
+
+### Demo visual (Fase 5, cumplida)
+
+- Las cuatro tarjetas están visibles en `/turnos/#emails`.
+- Cada tarjeta abre una vista previa modal con datos de ejemplo.
+- El copy aclara que el envío no está activo.
+- No se envía correo desde el tema: no hay `wp_mail`, cron ni SMTP.
+
+### Implementación real (fuera de alcance)
+
+Si se retoma el envío real, se deben cumplir estos criterios:
 
 - Todos los emails de la matriz se envían una sola vez por evento.
 - Los recordatorios de 24 h y 2 h llegan a Mailpit con la fecha/hora correcta y sin duplicados.

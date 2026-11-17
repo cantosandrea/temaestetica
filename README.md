@@ -4,6 +4,10 @@ GlowUp es un salón de estética en La Rioja capital. Este repositorio guarda el
 
 Es un trabajo práctico de la facultad. Corre en un entorno local y no cobra turnos.
 
+## Estado
+
+Fases 0 a 5 cerradas; Fase 6 fuera de alcance; Fase 7 completada (datos de prueba limpios y revisión final hecha). El cobro online está apagado por defecto, aunque la integración con Mercado Pago se haya probado en sandbox.
+
 ## Stack
 
 | Pieza | Versión |
@@ -13,7 +17,7 @@ Es un trabajo práctico de la facultad. Corre en un entorno local y no cobra tur
 | MariaDB | 10.4.32, puerto 3307 |
 | WooCommerce | 11.3.0 |
 | Tema `temaestetica` | 0.3.0 |
-| Plugin `glowup-turnos` | 0.3.0, esquema 1.1.0 |
+| Plugin `glowup-turnos` | 0.4.0, esquema 1.1.0 |
 | Moneda | ARS, precios con IVA incluido |
 | Zona horaria | `America/Argentina/La_Rioja` |
 
@@ -25,14 +29,14 @@ Es un trabajo práctico de la facultad. Corre en un entorno local y no cobra tur
 4. El plugin crea una orden de WooCommerce y la asocia al turno.
 5. La clienta ve el resumen con el código de reserva y el número de pedido.
 
-El cobro online está apagado. La orden queda pendiente y el plugin libera el horario cuando vence la retención.
+El cobro online está apagado por defecto. La Fase 4 se probó en sandbox, pero el interruptor sigue apagado: la orden queda pendiente y el plugin libera el horario cuando vence la retención.
 
 ## Puesta en marcha
 
 Necesitás XAMPP con WordPress y WooCommerce activos.
 
 1. Copiá este repo en `wp-content/themes/temaestetica`.
-2. Cloná `glowup-turnos` en `wp-content/plugins/glowup-turnos`.
+2. Copiá el repositorio `glowup-turnos` en `wp-content/plugins/glowup-turnos`.
 3. Activá WooCommerce, `glowup-turnos` y el tema.
 4. Revisá Ajustes > Generales para la zona horaria `America/Argentina/La_Rioja` y WooCommerce > Ajustes para la moneda ARS.
 5. Creá las páginas de la tabla y asigná cada plantilla.
@@ -98,6 +102,8 @@ El plugin siembra:
 
 El entorno de la demo también tiene 18 productos de WooCommerce en cinco categorías. Quedan como catálogo interno y el público no los ve.
 
+Al cierre de la práctica se limpiaron los datos de prueba: 0 turnos y 0 órdenes de reserva. El backup previo quedó en `C:\Users\Andree\AppData\Local\Temp\opencode\glowup-backup-20261116.sql`.
+
 ## Qué incluye la entrega
 
 - Home, Servicios, Nosotras y Contacto con contenido propio.
@@ -106,14 +112,16 @@ El entorno de la demo también tiene 18 productos de WooCommerce en cinco catego
 - Retención de 15 minutos con contador y liberación al vencer.
 - Prevención de solapamientos con lock por profesional y revalidación.
 - Orden de WooCommerce `pending` asociada al turno, sin cobro.
+- Integración de pagos con Mercado Pago probada en sandbox, con el interruptor apagado por defecto.
+- Demo visual de emails en `/turnos/#emails` (no envía correos).
 - Agenda de bloqueos en el panel GlowUp.
 - Tienda pública pausada con el cartel “Próximamente”.
 - Documentación del proyecto y guía de demo.
 
 ## Fuera de alcance
 
-- Cobro online con Mercado Pago, webhooks y reembolsos. El interruptor de pagos sigue apagado.
-- Emails transaccionales y recordatorios.
+- Cobro real con Mercado Pago. La integración se probó en sandbox, pero el interruptor sigue apagado por defecto.
+- Envío real de emails transaccionales y recordatorios.
 - Agenda diaria y semanal, edición de horarios y notas internas.
 - Cancelación y reprogramación desde la cuenta.
 - Dominio, hosting, correo de producción y textos legales definitivos.
@@ -125,6 +133,8 @@ El entorno de la demo también tiene 18 productos de WooCommerce en cinco catego
 - `docs/PLAN.md`: alcance, fases y estado.
 - `docs/ARQUITECTURA.md`: modelo de datos, API y flujo técnico.
 - `docs/FASES-REORGANIZADAS.txt`: fases y alcance de la entrega.
+- `docs/EMAILS.md`: diseño de emails y recordatorios; la demo visual ya está integrada y el envío real queda fuera de alcance.
 - `docs/GUIA-DEMO.md`: recorrido para la presentación.
+- `docs/capturas/`: capturas de referencia para la demo.
 
 El plugin `glowup-turnos` está en un repositorio aparte.
